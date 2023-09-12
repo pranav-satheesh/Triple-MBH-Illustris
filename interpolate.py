@@ -12,7 +12,7 @@ import scienceplots
 # print(sys.path)
 
 filename = "Data/paper2_sorted_data.txt"
-M1,qin,qout,a,b,c,d = np.loadtxt(filename,unpack=True)
+M1,qin,qout,a,b,c,d = np.loadtxt(filename,ußnpack=True)
 
 qin = [0.03162,0.1,0.3162,1]
 qout = [0.03162,0.1,0.3162,1]
