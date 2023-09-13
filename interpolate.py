@@ -4,8 +4,6 @@ import random
 import matplotlib.pyplot as plt
 import scienceplots
 
-
-
 # import os
 # import sys
 # print(os.path.dirname( __file__ ))
