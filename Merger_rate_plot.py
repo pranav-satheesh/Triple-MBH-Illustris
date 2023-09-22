@@ -20,6 +20,33 @@ def unit_comoving_vol(z):
     D_H = const.c.to('km/s').value/cosmo.H0.value
     return D_H * cosmo.comoving_transverse_distance(z).value**2 * cosmo.inv_efunc(z)
 
+def total_merger_rate(z_bh,zmax = 4,zbinsize = 0.01,lgzbinsize=0.2,lgzmin=-3.0,lgzmax = 1.0):
+    
+    lgz_bh = np.log10(z_bh)
+    dVcratio = np.array([unit_comoving_vol(z) 
+                                  for z in z_bh ]) * 4*np.pi/vol_comov_box
+    
+    Nmrg_zhist,zbin_edges = np.histogram(z_bh,range=(0,zmax),bins=int(zmax/zbinsize))
+    zbins = zbin_edges[:-1]+0.5*zbinsize
+    dNmrgdz,tmp = np.histogram(z_bh,weights=dVcratio,bins=zbin_edges)
+    
+    dt_zbins = []
+
+    for i in range(zbins.size):
+        zatage = cosmo.age(zbins[i]-0.5*zbinsize)-cosmo.age(zbins[i]+0.5*zbinsize)
+        dt_zbins.append(float(zatage/u.Gyr))
+
+    dt_zbins = np.array(dt_zbins)
+    
+    dNmrg_dzdt = np.array([dNmrgdz[i]/dt_zbins[i]/10**9
+                           for i in range(zbins.size)]) ## yr^-1 
+
+    
+    #merger_rate = np.sum(dNmrg_dzdt * zbinsize)
+
+    merger_rate = np.trapz(dNmrg_dzdt, dx = zbinsize)
+    
+    return merger_rate
 
 
 def merger_rate_log_plot(z_bh,zmax = 4,zbinsize = 0.01,lgzbinsize=0.2,lgzmin=-3.0,lgzmax = 1.0):
