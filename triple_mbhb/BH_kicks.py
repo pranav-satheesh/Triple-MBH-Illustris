@@ -2,7 +2,7 @@ from astropy import constants as const
 from astropy import units as u
 import numpy as np
 import spin_models as spin
-
+from tqdm import tqdm
 #convertions and constants
 G_value = const.G.value
 Msun_to_kg = (1*u.M_sun).to(u.kg).value #Msun to kg
@@ -116,7 +116,7 @@ def gw_kick_calc(qin, fgas, n_realizations=100):
     hybrid_kicks = []
     aligned_5deg_kicks = []
     
-    for _ in range(n_realizations):
+    for _ in tqdm(range(n_realizations), desc="Simulating kicks"):
         # Random spin alignment
         S1_rand, S2_rand = spin.random_dry()
         kick_rand = np.linalg.norm(spin.gw_kick(qin, S1_rand, S2_rand))
