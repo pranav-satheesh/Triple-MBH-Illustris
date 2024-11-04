@@ -7,7 +7,7 @@ triple_mbhb_find = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/triple_
 sys.path.insert(1,triple_mbhb_find)
 #import stalled_triple_model as stall
 
-Nruns = 100
+Nruns = 2
 file_path = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/Data/'
 
 Tr_objects = [Tr.Tripledynamics(file_path) for _ in tqdm(range(Nruns), desc="Triple MBH instances being created...")]
