@@ -189,8 +189,6 @@ def gw_kick(q,S1_vec,S2_vec):
     VB = 1792.45
     VC = 1506.52
 
-    
-
     Vm = A * eta**2 * np.sqrt(1 - 4 * eta) * (1 + B * eta)
     a1_pll = S1_vec[2]
     a2_pll = S2_vec[2]
@@ -226,5 +224,84 @@ def gw_kick(q,S1_vec,S2_vec):
     Vk[0] = Vm + Vs_prp * np.cos(xi)
     Vk[1] = Vs_prp * np.sin(xi)
     Vk[2] = Vs_pll
+
+    return Vk
+
+
+def gw_kick_np(q, S1_vec, S2_vec):
+    # Symmetric mass ratio
+    eta = q / (1 + q)**2
+
+    a1mag = np.linalg.norm(S1_vec, axis=1)
+    a2mag = np.linalg.norm(S2_vec, axis=1)
+
+    ### Constants for kick equation from Lousto & Zlochower 2009, Lousto et al. 2010
+    A = 1.2e+4  # km/s  
+    B = -0.93  
+    H = 6.9e+3  # km/s 
+    xi = 145.0 * np.pi / 180.0
+    
+    ### Constants from Lousto et al. 2012 (incl. hangup kicks)
+    V11 = 3677.76
+    VA = 2481.21
+    VB = 1792.45
+    VC = 1506.52
+
+    # Vm component
+    Vm = A * eta**2 * np.sqrt(1 - 4 * eta) * (1 + B * eta)
+
+    # Perpendicular and parallel components of spin vectors
+    a1_pll = S1_vec[:, 2]
+    a2_pll = S2_vec[:, 2]
+    a1_prp = S1_vec[:, :2]
+    a2_prp = S2_vec[:, :2]
+
+    # Vs_prp component
+    Vs_prp = H * eta * eta / (1 + q) * (a2_pll - q * a1_pll)
+
+    # Determine if there is any non-zero perpendicular spin component
+    non_zero_prp = (np.linalg.norm(a1_prp, axis=1) > 0) | (np.linalg.norm(a2_prp, axis=1) > 0)
+    
+    # S-tilde from Lousto et al. 2012 for non-zero perpendicular components
+    St_pll = np.where(
+        non_zero_prp,
+        2 * (a2_pll + q**2 * a1_pll) / ((1 + q)**2),
+        0
+    )
+
+    # Delta_prp for non-zero perpendicular components
+    Delta_prp = np.where(
+        non_zero_prp[:, None],
+        (1 + q) * (a2_prp - q[:, None] * a1_prp),
+        0
+    )
+
+    # cos(Delta_prp) calculation
+    cos_Delta_prp = np.where(
+        non_zero_prp,
+        Delta_prp[:, 0] / np.linalg.norm(Delta_prp, axis=1),
+        0
+    )
+
+    # Randomized phase and sign
+    phi1 = 2 * np.pi * np.random.random(len(q))
+    sign = np.where(np.random.rand(len(q)) < 0.1, -1, 1)
+
+    # Vs_pll component for non-zero perpendicular spin vectors
+    Vs_pll = np.where(
+        non_zero_prp,
+        (16 * eta**2 / (1 + q) *
+         (V11 + VA * St_pll + VB * St_pll**2 + VC * St_pll**3) *
+         np.sqrt((a2_prp[:, 0] - q * a1_prp[:, 0])**2 +
+                 (a2_prp[:, 1] - q * a1_prp[:, 1])**2) *
+         np.cos(np.pi + sign * np.arccos(cos_Delta_prp) - phi1)),
+        0
+    )
+
+    # Vk components
+    Vk = np.zeros((len(q), 3))
+    Vk[:, 0] = Vm + Vs_prp * np.cos(xi)
+    Vk[:, 1] = Vs_prp * np.sin(xi)
+    Vk[:, 2] = Vs_pll
 
     return Vk

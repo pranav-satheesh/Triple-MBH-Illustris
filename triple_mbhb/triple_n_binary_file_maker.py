@@ -196,12 +196,18 @@ class ms_tests(tripleMatches):
         M2_trip_in = masses_inner_binary[:,0]
         qbh_inner_in = M2_trip_in/M1_trip_in
 
-        M2_trip_temp = M2_trip_in + delta_m* qbh_inner_in # masses after accretion 
-        M1_trip_temp = M1_trip_in + delta_m*(1-qbh_inner_in)
+        M2_trip_temp = M2_trip_in + delta_m*(1/(1+qbh_inner_in))
+        M1_trip_temp = M1_trip_in + delta_m*(qbh_inner_in/(1+qbh_inner_in))
+
+        #M2_trip_temp = M2_trip_in + delta_m* qbh_inner_in # masses after accretion 
+        #M1_trip_temp = M1_trip_in + delta_m*(1-qbh_inner_in)
+
+
         #redifining M1 and M2
         M1_trip = np.maximum(M1_trip_temp,M2_trip_temp)
         M2_trip = np.minimum(M1_trip_temp,M2_trip_temp)
         M3_trip = intruder_mass
+        
         qbh_inner = M2_trip/M1_trip
         qbh_outer = intruder_mass/inner_binary_mass_in_next_merger
                
