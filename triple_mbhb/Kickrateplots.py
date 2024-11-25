@@ -157,66 +157,6 @@ def plot_rate_kicks(strong_tr, weak_tr, iso_bin, v_max_values, vbin_sizes, Nruns
     
     return fig, ax
 
-# def dNbydV(strong_tr,weak_tr,iso_bin,v_max,vbin_size,Nruns):
-
-#     dNbydV_sling = []
-#     dNbydV_rand = []
-#     dNbydV_hybrid = []
-#     dNbydV_deg5 = []
-
-#     for i in range(Nruns):
-#         Nvslingshot,vbin_edges = np.histogram(strong_tr[i].slingshot_kicks,range=(0,v_max),bins=int(v_max/vbin_size))
-#         vbins = vbin_edges[:-1] + 0.5*vbin_size
-#         dNbydV_sling.append(Nvslingshot/vbin_size)
-
-#         dNv_rand_strong,tmp = np.histogram(strong_tr[i].gw_kick_random,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_rand_weak,tmp = np.histogram(weak_tr.gw_kick_random,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_rand_binary,tmp = np.histogram(iso_bin.gw_kick_random,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNbydV_rand.append((dNv_rand_binary+dNv_rand_strong+dNv_rand_weak)/vbin_size)
-
-#         dNv_hybrid_strong,tmp = np.histogram(strong_tr[i].gw_kick_hybrid,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_hybrid_weak,tmp = np.histogram(weak_tr.gw_kick_hybrid,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_hybrid_binary,tmp = np.histogram(iso_bin.gw_kick_hybrid,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNbydV_hybrid.append((dNv_hybrid_binary+dNv_hybrid_strong+dNv_hybrid_weak)/vbin_size)
-
-#         dNv_deg5_strong,tmp = np.histogram(strong_tr[i].gw_kick_5deg,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_deg5_weak,tmp = np.histogram(weak_tr.gw_kick_5deg,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNv_deg5_binary,tmp = np.histogram(iso_bin.gw_kick_5deg,range=(0,v_max),bins=int(v_max/vbin_size))
-#         dNbydV_deg5.append((dNv_deg5_binary+dNv_deg5_strong+dNv_deg5_weak)/vbin_size)  
-
-#     dNbydV_sling = np.array(dNbydV_sling)/vol_comov_box
-#     dNbydV_hybrid = np.array(dNbydV_hybrid)/vol_comov_box
-#     dNbydV_rand = np.array(dNbydV_rand)/vol_comov_box
-#     dNbydV_deg5 = np.array(dNbydV_deg5)/vol_comov_box
-
-#     return vbins,dNbydV_sling,dNbydV_rand,dNbydV_hybrid,dNbydV_deg5        
-
-# def plot_rate_kicks(strong_tr,weak_tr,iso_bin,v_max,vbin_size,Nruns):
-#     fig,ax = plt.subplots(figsize=(7,6))
-
-
-#     vbins,dNdVsling,dNdVrand,dNdVhybrid,dNdVdeg5 = dNbydV(strong_tr,weak_tr,iso_bin,v_max,vbin_size,Nruns)
-#     ax.plot(vbins,np.mean(dNdVsling,axis=0),linestyle='-', marker='o',color=kick_colors["slingshot"],label="slingshot")
-#     ax.fill_between(vbins,np.mean(dNdVsling,axis=0)-np.std(dNdVsling,axis=0),np.mean(dNdVsling,axis=0)+np.std(dNdVsling,axis=0),color=kick_colors["slingshot"],alpha=0.5)
-
-#     ax.plot(vbins,np.mean(dNdVrand,axis=0),linestyle='-', marker='o',color=kick_colors["random"],label="random")
-#     ax.fill_between(vbins,np.mean(dNdVrand,axis=0)-np.std(dNdVrand,axis=0),np.mean(dNdVrand,axis=0)+np.std(dNdVrand,axis=0),color=kick_colors["random"],alpha=0.5) 
-
-#     ax.plot(vbins,np.mean(dNdVhybrid,axis=0),linestyle='-', marker='o',color=kick_colors["hybrid"],label="hybrid")
-#     ax.fill_between(vbins,np.mean(dNdVhybrid,axis=0)-np.std(dNdVhybrid,axis=0),np.mean(dNdVhybrid,axis=0)+np.std(dNdVhybrid,axis=0),color=kick_colors["hybrid"],alpha=0.5)  
-
-#     ax.plot(vbins,np.mean(dNdVdeg5,axis=0),linestyle='-', marker='o',color=kick_colors['aligned'],label="aligned")
-#     ax.fill_between(vbins,np.mean(dNdVdeg5,axis=0)-np.std(dNdVdeg5,axis=0),np.mean(dNdVdeg5,axis=0)+np.std(dNdVdeg5,axis=0),color="#0571b0",alpha=0.5)       
-#     ax.set_yscale("log",base=10)
-#     ax.set_xlabel("$v_t$")
-#     ax.set_ylabel("$R_{kicks} [Gpc^{-3} km^{-1} s]$")
-#     ax.legend()       
-#     ax.set_xlim(0,v_max)
-#     #ax.set_ylim(1e-,)
-#     fig.tight_layout()
-    
-
-#     return fig,ax
 
 def plot_N_kicks(df_strong,df_weak,df_binary,thresholds):
      

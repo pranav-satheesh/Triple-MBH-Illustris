@@ -98,7 +98,54 @@ def v_and_a_after_slingshot(m1,m2,mint,aini,m1_scatt_key):
 
 #     return kick_rand,kick_hybrid,kick_5d
 
-def gw_kick_calc(qin, fgas, n_realizations=100):
+
+def gw_kick_assign(obj,n_realizations=10,tr_flag="No"):
+    
+    v_random = []
+    v_hybrid = []
+    v_aligned = []
+
+    if(tr_flag=="Yes"):
+        q_merger = obj.qin_merger[obj.merger_mask]
+    else:
+        q_merger = obj.qin[obj.merger_mask]
+
+    fgas_merger = obj.fgas[obj.merger_mask]
+
+    for i in tqdm(range(n_realizations),desc="calculating kick velocities for N realizations"):
+        
+        v_rand_n = []
+        v_hybrid_n = []
+        v_aligned_n = []
+
+        for i in range(np.sum(obj.merger_mask)):
+            
+            S1_rand,S2_rand = spin.random_dry()
+            v_rand_n.append(np.linalg.norm(spin.gw_kick(q_merger[i],S1_rand,S2_rand)))    
+
+            # Hybrid alignment based on gas fraction
+            if fgas_merger[i] < 0.1:
+                # Gas-poor: spins are random and misaligned
+                S1_hybrid, S2_hybrid = spin.random_dry()
+            else:
+                # Gas-rich: spins are nearly aligned
+                S1_hybrid, S2_hybrid = spin.cold()
+            
+            v_hybrid_n.append(np.linalg.norm(spin.gw_kick(q_merger[i], S1_hybrid, S2_hybrid)))
+            
+                # Nearly aligned spins (5-degree alignment)
+            S1_aligned, S2_aligned = spin.deg5_high()
+            v_aligned_n.append(np.linalg.norm(spin.gw_kick(q_merger[i], S1_aligned, S2_aligned)))
+
+        v_random.append(v_rand_n)
+        v_hybrid.append(v_hybrid_n)
+        v_aligned.append(v_aligned_n)
+
+    return v_random,v_hybrid,v_aligned
+
+
+#will comment this function out later
+def gw_kick_calc(qin, fgas):
     """
     Calculates and averages the gravitational wave kicks for three spin alignment cases: 
     random, hybrid (gas-poor/gas-rich based on fgas), and nearly aligned (5 degrees).
@@ -116,31 +163,33 @@ def gw_kick_calc(qin, fgas, n_realizations=100):
     hybrid_kicks = []
     aligned_5deg_kicks = []
     
-    for _ in tqdm(range(n_realizations), desc="Simulating kicks"):
-        # Random spin alignment
-        S1_rand, S2_rand = spin.random_dry()
-        kick_rand = np.linalg.norm(spin.gw_kick(qin, S1_rand, S2_rand))
-        random_kicks.append(kick_rand)
+
+    # Random spin alignment
+    S1_rand, S2_rand = spin.random_dry()
+    kick_rand = np.linalg.norm(spin.gw_kick(qin, S1_rand, S2_rand))
+    random_kicks.append(kick_rand)
         
         # Hybrid alignment based on gas fraction
-        if fgas < 0.1:
+    if fgas < 0.1:
             # Gas-poor: spins are random and misaligned
-            S1_hybrid, S2_hybrid = spin.random_dry()
-        else:
+        S1_hybrid, S2_hybrid = spin.random_dry()
+    else:
             # Gas-rich: spins are nearly aligned
-            S1_hybrid, S2_hybrid = spin.cold()
+        S1_hybrid, S2_hybrid = spin.cold()
         
-        kick_hybrid = np.linalg.norm(spin.gw_kick(qin, S1_hybrid, S2_hybrid))
-        hybrid_kicks.append(kick_hybrid)
+    kick_hybrid = np.linalg.norm(spin.gw_kick(qin, S1_hybrid, S2_hybrid))
+    hybrid_kicks.append(kick_hybrid)
         
         # Nearly aligned spins (5-degree alignment)
-        S1_aligned, S2_aligned = spin.deg5_high()
-        kick_5d = np.linalg.norm(spin.gw_kick(qin, S1_aligned, S2_aligned))
-        aligned_5deg_kicks.append(kick_5d)
+    S1_aligned, S2_aligned = spin.deg5_high()
+    kick_5d = np.linalg.norm(spin.gw_kick(qin, S1_aligned, S2_aligned))
+    aligned_5deg_kicks.append(kick_5d)
     
     # Calculate and return the averages
-    avg_kick_rand = np.mean(random_kicks)
-    avg_kick_hybrid = np.mean(hybrid_kicks)
-    avg_kick_5deg = np.mean(aligned_5deg_kicks)
+    avg_kick_rand = random_kicks
+    avg_kick_hybrid = hybrid_kicks
+    avg_kick_5deg = aligned_5deg_kicks
     
     return avg_kick_rand, avg_kick_hybrid, avg_kick_5deg
+
+

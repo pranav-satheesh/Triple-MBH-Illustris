@@ -176,7 +176,7 @@ class Tripledynamics:
 
 
                     slingshot_kicks.append(vsling)
-                    rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i],n_realizations=10)
+                    rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i])
                     gw_kick_random.append(np.mean(rand))
                     gw_kick_5deg.append(np.mean(deg5))
                     gw_kick_hybrid.append(np.mean(hyb))
@@ -226,11 +226,11 @@ class Tripledynamics:
                     merger_flags.append("Tr-ej")
                     merger_after_ejection = merger_after_ejection + 1
 
-                    rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i],n_realizations=100)
+                    # rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i])
 
-                    gw_kick_random.append(rand)
-                    gw_kick_5deg.append(deg5)
-                    gw_kick_hybrid.append(hyb)
+                    # gw_kick_random.append(rand)
+                    # gw_kick_5deg.append(deg5)
+                    # gw_kick_hybrid.append(hyb)
 
                     z_triple_merger.append(z_at_value(cosmo.age,(t_triple_merge/10**9)*u.Gyr,zmin=1e-9).value)
                     qin_new_array.append(qin_new)
@@ -260,9 +260,9 @@ class Tripledynamics:
         self.a_triple_after = a_triple_interaction
 
         self.slingshot_kicks = slingshot_kicks
-        self.gw_kick_random =gw_kick_random
-        self.gw_kick_5deg =gw_kick_5deg
-        self.gw_kick_hybrid =gw_kick_hybrid
+        # self.gw_kick_random =gw_kick_random
+        # self.gw_kick_5deg =gw_kick_5deg
+        # self.gw_kick_hybrid =gw_kick_hybrid
 
 
         self.prompt_merger = prompt_merger 
@@ -339,7 +339,7 @@ class iso_binary:
         self.N_iso_binaries = len(self.M1)
         self.merger_mask = self.merger_flag
         self.z_merger = self.z_merge
-        self.kick_assign()
+        #self.kick_assign()
     
     def kick_assign(self):
 
@@ -347,9 +347,9 @@ class iso_binary:
         gw_kick_hybrid = []
         gw_kick_5deg = []
 
-        for i in range(self.N_iso_binaries):
+        for i in tqdm(range(self.N_iso_binaries),desc="assigning kicks to iso binaries"):
 
-            vgw_rand,vgw_hybrid,vgw_5deg = kicks.gw_kick_calc(self.qin[i],self.fgas[i],n_realizations=100)
+            vgw_rand,vgw_hybrid,vgw_5deg = kicks.gw_kick_calc(self.qin[i],self.fgas[i])
             gw_kick_random.append(vgw_rand)
             gw_kick_hybrid.append(vgw_hybrid)
             gw_kick_5deg.append(vgw_5deg)
@@ -410,11 +410,11 @@ class weak_triples:
                 else:
                     print(attr_name)
                     print(attr.shape)
-                    
+
         self.z_merger = self.z_bin_merger[~self.strong_trip_key]
         self.N_weak_triples = len(self.M1)
         self.merger_mask = self.bin_merge_flag
-        self.kick_assign()
+        #self.kick_assign()
         
     
     def kick_assign(self):
@@ -423,9 +423,9 @@ class weak_triples:
         gw_kick_hybrid = []
         gw_kick_5deg = []
 
-        for i in range(self.N_weak_triples):
+        for i in tqdm(range(self.N_weak_triples),desc="assigning kicks to weak triples"):
 
-            vgw_rand,vgw_hybrid,vgw_5deg = kicks.gw_kick_calc(self.qin[i],self.fgas[i],n_realizations=100)
+            vgw_rand,vgw_hybrid,vgw_5deg = kicks.gw_kick_calc(self.qin[i],self.fgas[i])
             gw_kick_random.append(vgw_rand)
             gw_kick_hybrid.append(vgw_hybrid)
             gw_kick_5deg.append(vgw_5deg)

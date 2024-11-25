@@ -3,11 +3,14 @@ import pickle
 from tqdm import tqdm
 import os
 import sys
+import BH_kicks as kick
+
+
 triple_mbhb_find = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/triple_mbhb'
 sys.path.insert(1,triple_mbhb_find)
 #import stalled_triple_model as stall
 
-Nruns = 2
+Nruns = 100
 file_path = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/Data/'
 
 Tr_objects = [Tr.Tripledynamics(file_path) for _ in tqdm(range(Nruns), desc="Triple MBH instances being created...")]
@@ -15,9 +18,27 @@ iso_bin = Tr.iso_binary(file_path)
 weak_tr = Tr.weak_triples(file_path)
 stalled_objs = [Tr.stalledtriples(file_path) for _ in tqdm(range(Nruns), desc="stalled Triple MBH instances being created...")]
 
-iso_filename = os.path.abspath('../obj_data/iso_bin.pkl')
-weak_tr_filename = os.path.abspath('../obj_data/weak_tr.pkl')
-strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}.pkl')
+iso_vrand,iso_vhybrid,iso_valigned = kick.gw_kick_assign(iso_bin,tr_flag="No")
+iso_bin.v_kick_random = iso_vrand
+iso_bin.v_kick_hybrid = iso_vhybrid
+iso_bin.v_kick_aligned = iso_valigned
+
+
+weak_tr_vrand,weak_tr_vhybrid,weak_tr_valigned = kick.gw_kick_assign(weak_tr,tr_flag="No")
+weak_tr.v_kick_random = weak_tr_vrand
+weak_tr.v_kick_hybrid = weak_tr_vhybrid
+weak_tr.v_kick_aligned = weak_tr_valigned
+
+for i in tqdm(range(Nruns),desc="assigning kicks to strong triple instances"):
+    strong_tr_vrand,strong_tr_vhybrid,strong_tr_valigned = kick.gw_kick_assign(Tr_objects[i],tr_flag="Yes")
+    Tr_objects[i].v_kick_random = strong_tr_vrand
+    Tr_objects[i].v_kick_hybrid = strong_tr_vhybrid
+    Tr_objects[i].v_kick_aligned = strong_tr_valigned
+
+
+iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
+weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
+strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
 stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
 
 with open(strong_tr_filename, 'wb') as f:
@@ -31,3 +52,5 @@ with open(weak_tr_filename, 'wb') as f:
 
 with open(stalled_tr_filename, 'wb') as f:
     pickle.dump(stalled_objs, f, pickle.HIGHEST_PROTOCOL)
+
+
