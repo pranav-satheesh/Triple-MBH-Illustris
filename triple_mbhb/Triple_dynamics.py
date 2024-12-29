@@ -170,10 +170,8 @@ class Tripledynamics:
                         #m3 exchanges with m1. m2 and m3 merges
                         vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,True)
 
-
                     else:
                         vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,False)
-
 
                     slingshot_kicks.append(vsling)
                     rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i])
@@ -199,7 +197,6 @@ class Tripledynamics:
             
             else:
                 
-
                 vsling,a_triple_after,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,False)
                 slingshot_kicks.append(vsling)
 
@@ -210,15 +207,19 @@ class Tripledynamics:
                 #     strong_triple_index = i
                 #     tau_merger = timsecale_to_merger(strong_triple_index,a_triple_after)
                 #     t_triple_merge = self.t_triple_form[i]+tau_merger
-                
-                #strong_triple_index = i
-                tau_merger = time_to_merger(self.sep[i],self.dadt[i],a_triple_after)
-                #tau_merger = timsecale_to_merger(strong_triple_index,a_triple_after)
-
+            
+                #tau_merger = time_to_merger(self.sep[i],self.dadt[i],a_triple_after)
+            
                 if(a_triple_after>a_triple):
-                    t_triple_merge = self.t_bin_merger[i]
+                    #exchange event. Considet the outer binary for evolution.
+                    tau_merger = time_to_merger(self.sep_outer_binary[i],self.dadt_outer_binary[i],a_triple_after)
+                    #t_triple_merge = self.t_bin_merger[i]
                 else:
-                    t_triple_merge = self.t_triple_form[i]+tau_merger
+                    #the intruder is just scattered off.
+                    tau_merger = time_to_merger(self.sep_inner_binary[i],self.dadt_inner_binary[i],a_triple_after)
+                    #t_triple_merge = self.t_triple_form[i]+tau_merger
+
+                t_triple_merge = self.t_triple_form[i]+tau_merger
                 t_triple_merger_values.append(t_triple_merge)
                 a_triple_interaction.append(a_triple_after)
 

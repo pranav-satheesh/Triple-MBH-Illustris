@@ -62,6 +62,12 @@ class ms_tests(tripleMatches):
 
         self.inner_binary_times = self.times[self._next.idx_inner_binary, :]
         self.outer_binary_times = self.times[self._next.idx_outer_binary, :]
+
+        self.inner_binary_seps = self.sep[self._next.idx_inner_binary, :]
+        self.outer_binary_seps = self.sep[self._next.idx_outer_binary, :]
+
+        self.inner_binary_dadt = self.dadt[self._next.idx_inner_binary, :]
+        self.outer_binary_dadt = self.dadt[self._next.idx_outer_binary, :]
         
         #total mass of inner binary
         self.inner_binary_initial_mtotal = self.inner_binary_initial_mass.sum(axis=1)
@@ -246,6 +252,10 @@ class ms_tests(tripleMatches):
             'a_triple_form':a_triple[strong_in_triple_mask],
             'bhid_inner':inner_binary_ids[strong_in_triple_mask],
             'bhid_outer':outer_binary_ids[strong_in_triple_mask],
+            'sep_inner_binary':self.inner_binary_seps[strong_in_triple_mask],
+            'sep_outer_binary':self.outer_binary_seps[strong_in_triple_mask],
+            'dadt_inner_binary':self.inner_binary_dadt[strong_in_triple_mask],
+            'dadt_outer_binary':self.outer_binary_dadt[strong_in_triple_mask],
             'sep':self.sep[self.triple_mask][strong_in_triple_mask],
             'dadt':self.dadt[self.triple_mask][strong_in_triple_mask],
             'times':self.times[self.triple_mask][strong_in_triple_mask]
@@ -277,6 +287,8 @@ class ms_tests(tripleMatches):
                         value = value.astype('U')  # Convert to bytes
                         print(f"Key: {key}, Shape: {value.shape}, Data Type: {value.dtype}")
                     hf.create_dataset(key, data=value)
+
+            print("File saved at", save_path + 'strong_triples_data_from_ill.h5')
             # df = pd.DataFrame([M1_trip,M2_trip,M3_trip,qbh_inner,qbh_outer,t_triple,z_triple,t_form1,t_form2,t_evol_binary,a_triple,binary_merged_before_z0_flag,inner_binary_ids_st[:,0],inner_binary_ids_st[:,1],outer_binary_ids_st[:,0],outer_binary_ids_st[:,1],fgas_strong_trip,Vescape_strong_trip,Phi_DM_strong_trip,Phi_star_strong_trip,M_halo_strong_trip,M_star_strong_trip,rhalf_strong_trip,sigma_strong_trip,rbulge_strong_trip])
             # df = df.transpose()
             # df.columns = ['M1','M2','M3','qin','qout','t_triple_form','z_form','t_form1','t_form2','t_merge_bin','a_2nd_ovtks','bin_merger_flag','bhid1','bhid2','bhid3','bhid4','f-gas','Vescape','Phi_DM','Phi_star','M_halo','M_star','rhalf','sigma','rbulge']
@@ -333,6 +345,7 @@ class ms_tests(tripleMatches):
                         print(f"Key: {key}, Shape: {value.shape}, Data Type: {value.dtype}")
                     hf.create_dataset(key, data=value)
 
+            print("File saved at", save_path + 'all_triples_data_from_ill.h5')
             # df = pd.DataFrame([M1_trip,M2_trip,M3_trip,qbh_inner,qbh_outer,t_triple,z_merger,t_form1,t_form2,a_triple,binary_merged_before_z0_flag,strong_in_triple_mask,inner_binary_ids[:,0],inner_binary_ids[:,1],outer_binary_ids[:,0],outer_binary_ids[:,1],fgas,Vescape,Phi_DM,Phi_star,M_halo,M_star,rhalf,sigma,rbulge])
             # df = df.transpose()
             # df.columns = ['M1','M2','M3','qin','qout','t_triple_form','z_merger','t_form1','t_form2','a_2nd_ovtks','bin_merger_flag','strong_key','bhid1','bhid2','bhid3','bhid4','f-gas','Vescape','Phi_DM','Phi_star','M_halo','M_star','rhalf','sigma','rbulge']
