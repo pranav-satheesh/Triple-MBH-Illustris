@@ -2,6 +2,9 @@
 import numpy as np
 import Triple_dynamics as Tr
 
+
+#some utility functions to print some stats
+
 def Trip_stats(Trip_objs):
 
     Nruns = len(Trip_objs)
