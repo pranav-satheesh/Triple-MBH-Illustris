@@ -77,24 +77,18 @@ def median_values_q_M_z(strong_tr,weak_tr,iso_bin,Nruns):
     print(f"M mean for weak:{np.median(np.log10(weak_tr.M1[weak_tr.weak_triple_mask][weak_tr.merger_mask]+weak_tr.M2[weak_tr.weak_triple_mask][weak_tr.merger_mask])):.3f}")
     M_merger_median_strong = []
     for i in range(Nruns):
-        M_merger_median_strong.append(np.median(np.log10(strong_tr[i].mbin_merger)))
+        M_merger_median_strong.append(np.median(np.log10(strong_tr[i].mbin_merger[strong_tr[i].merger_mask])))
     print(f"M mean for strong:{np.mean(M_merger_median_strong):.3f}")
     print("------------------------------------------")
 
-
-    print(f"z mean for iso:{np.median(np.log10(iso_bin.M1[iso_bin.merger_mask]+iso_bin.M2[iso_bin.merger_mask])):.2f}")
-    print(f"z mean for weak:{np.median(np.log10(weak_tr.M1[weak_tr.weak_triple_mask][weak_tr.merger_mask]+weak_tr.M2[weak_tr.weak_triple_mask][weak_tr.merger_mask])):.3f}")
-
-    z_merger_median_strong = []
     z_min_strong = []
     z_max_strong = []
 
     for i in range(Nruns):
-        z_merger_median_strong.append(np.median(np.log10(strong_tr[i].mbin_merger)))
         z_min_strong.append(np.min(strong_tr[i].z_triple_merger[strong_tr[i].merger_mask]))
         z_max_strong.append(np.max(strong_tr[i].z_triple_merger[strong_tr[i].merger_mask]))
     
-    print(f"z mean for strong:{np.mean(z_merger_median_strong):.3f}")
+    
     print(f"z min for strong:{np.mean(z_min_strong):.3f}")
     print(f"z max for strong:{np.mean(z_max_strong):.3f}")
 

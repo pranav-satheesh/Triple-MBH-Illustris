@@ -165,13 +165,14 @@ class Tripledynamics:
                     prompt_merger = prompt_merger + 1
                     z_triple_merger.append(z_at_value(cosmo.age,(t_triple_merge/10**9)*u.Gyr,zmin=1e-9).value)
                     merger_flags.append("Tr")
+                    vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple)
                     
-                    if(P > a_P+b_P and P <= a_P+b_P+c_P):
-                        #m3 exchanges with m1. m2 and m3 merges
-                        vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,True)
+                    # if(P > a_P+b_P and P <= a_P+b_P+c_P):
+                    #     #m3 exchanges with m1. m2 and m3 merges
+                    #     vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,True)
 
-                    else:
-                        vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,False)
+                    # else:
+                    #     vsling,a_new,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,False)
 
                     slingshot_kicks.append(vsling)
                     rand,hyb,deg5 = kicks.gw_kick_calc(qin_new,self.fgas[i])
@@ -197,7 +198,7 @@ class Tripledynamics:
             
             else:
                 
-                vsling,a_triple_after,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple,False)
+                vsling,a_triple_after,qin_new,mbin_new = kicks.v_and_a_after_slingshot(m1_bin,m2_bin,m_int,a_triple)
                 slingshot_kicks.append(vsling)
 
                 # if(a_triple_after>a_triple):
@@ -790,13 +791,13 @@ def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns):
     dNdlogzdt_stalled_total = []
 
     for i in range(Nruns):
-        lgzbins_strong_total,dNdlogzdt_strong_tot_tmp = Tr_objects[i].diff_merger_Rate_for_plot(merger_arg="all",lgzbinsize=0.15,lgzmin=-3,lgzmax=1.0)
+        lgzbins_strong_total,dNdlogzdt_strong_tot_tmp = Tr_objects[i].diff_merger_Rate_for_plot(merger_arg="all",lgzbinsize=0.2,lgzmin=-3.7,lgzmax=1.2)
         dNdlogzdt_strong_total.append(dNdlogzdt_strong_tot_tmp)
-        lgzbins_stalled,dNdlogzdt_stalled = stalled_objs[i].diff_merger_Rate_for_plot("Tr",lgzbinsize=0.15,lgzmin=-3,lgzmax=1.0)
+        lgzbins_stalled,dNdlogzdt_stalled = stalled_objs[i].diff_merger_Rate_for_plot("Tr",lgzbinsize=0.2,lgzmin=-3.6,lgzmax=1.0)
         dNdlogzdt_stalled_total.append(dNdlogzdt_stalled)
 
-    lgzbins_iso,dNdlogzdt_iso = iso_bin.diff_merger_Rate_for_plot(lgzbinsize=0.15,lgzmin=-3,lgzmax=1.0)
-    lgzbins_weak,dNdlogzdt_weak = weak_tr.diff_merger_Rate_for_plot(lgzbinsize=0.15,lgzmin=-3,lgzmax=1.0)
+    lgzbins_iso,dNdlogzdt_iso = iso_bin.diff_merger_Rate_for_plot(lgzbinsize=0.2,lgzmin=-3.7,lgzmax=1.2)
+    lgzbins_weak,dNdlogzdt_weak = weak_tr.diff_merger_Rate_for_plot(lgzbinsize=0.2,lgzmin=-3.7,lgzmax=1.2)
     dNdlogzdt_all = dNdlogzdt_iso + dNdlogzdt_weak + np.mean(dNdlogzdt_strong_total,axis=0)
 
 
