@@ -1,0 +1,5 @@
+/tmp/slurmd/job54647742/slurm_script: line 18: N_instances: command not found
+Traceback (most recent call last):
+  File "/home/pranavsatheesh/Triple-Outcomes/triple_mbhb/triple_outcomes_run.py", line 8, in <module>
+    triple_mbhb_find = sys.argv[2]
+IndexError: list index out of range
