@@ -1,17 +1,25 @@
-import Triple_dynamics as Tr
+
 import pickle
 from tqdm import tqdm
 import os
 import sys
-import BH_kicks as kick
 
+Nruns = int(sys.argv[1])
+triple_mbhb_find = sys.argv[2]
+file_path = sys.argv[3]
+obj_file_path = sys.argv[4]
 
-triple_mbhb_find = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/triple_mbhb'
 sys.path.insert(1,triple_mbhb_find)
+
+import BH_kicks as kick
+import Triple_dynamics as Tr
+
+# triple_mbhb_find = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/triple_mbhb'
+
 #import stalled_triple_model as stall
 
-Nruns = 100
-file_path = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/Data/'
+
+# file_path = '/Users/pranavsatheesh/Triples/Github/Triple-Outcomes/Data/'
 
 Tr_objects = [Tr.Tripledynamics(file_path) for _ in tqdm(range(Nruns), desc="Triple MBH instances being created...")]
 iso_bin = Tr.iso_binary(file_path)
@@ -36,10 +44,16 @@ for i in tqdm(range(Nruns),desc="assigning kicks to strong triple instances"):
     Tr_objects[i].v_kick_aligned = strong_tr_valigned
 
 
-iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
-weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
-strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
-stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
+# iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
+
+iso_filename = obj_file_path+'iso_bin_wkick.pkl'
+weak_tr_filename = obj_file_path+'weak_tr_wkick.pkl'
+strong_tr_filename = obj_file_path+f'tr{Nruns}_wkick.pkl'
+stalled_tr_filename = obj_file_path+f'stalled{Nruns}.pkl'
+
+# weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
+# strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
+# stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
 
 with open(strong_tr_filename, 'wb') as f:
     pickle.dump(Tr_objects, f, pickle.HIGHEST_PROTOCOL)
