@@ -130,3 +130,4 @@ dmypy.json
 .DS_Store
 
 obj_data/*.pkl
+*.pkl
