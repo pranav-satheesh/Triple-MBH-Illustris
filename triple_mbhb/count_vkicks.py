@@ -92,7 +92,7 @@ def plot_kick_distribution(kick_types_data):
         linestyle = kick_linestyles.get(label, "-") 
 
         # Plot mean and fill standard deviation
-        ax.plot(velocity_bins[:-1], mean_counts, color=color, linestyle=linestyle, linewidth = 2,label=label)
+        ax.plot(velocity_bins[:-1], mean_counts, color=color, linestyle=linestyle,label=label)
         ax.fill_between(velocity_bins[:-1], mean_counts - std_counts, mean_counts + std_counts, color=color, alpha=0.2)
     
     ax.set_xlabel('Velocity (km/s)')
@@ -102,7 +102,6 @@ def plot_kick_distribution(kick_types_data):
     ax.set_yscale("log",base=10)
     ax.set_xscale("log",base=10)
     ax.legend()
-    plt.show()
     return fig,ax
 
 def kicks_above_threshold(iso_bin,weak_tr,strong_tr,Nruns,kick_type,vthreshold=500):
