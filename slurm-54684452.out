@@ -1,129 +1,0 @@
-Triple MBH instances being created...:   0%| | 0/10 [00:00<?, ?it/home/pranavsatheesh/Triple-Outcomes/triple_mbhb/Triple_dynamics.py:69: RuntimeWarning: divide by zero encountered in divide
-  func = 1/dadt_array
-Triple MBH instances being created...:  10%| | 1/10 [00:03<00:30,Triple MBH instances being created...:  20%|▏| 2/10 [00:06<00:26,Triple MBH instances being created...:  30%|▎| 3/10 [00:09<00:22,Triple MBH instances being created...:  40%|▍| 4/10 [00:13<00:19,Triple MBH instances being created...:  50%|▌| 5/10 [00:16<00:16,Triple MBH instances being created...:  60%|▌| 6/10 [00:19<00:13,Triple MBH instances being created...:  70%|▋| 7/10 [00:22<00:09,Triple MBH instances being created...:  80%|▊| 8/10 [00:26<00:06,Triple MBH instances being created...:  90%|▉| 9/10 [00:29<00:03,Triple MBH instances being created...: 100%|█| 10/10 [00:33<00:00Triple MBH instances being created...: 100%|█| 10/10 [00:33<00:00
-z_bin_merger
-(2029,)
-stalled Triple MBH instances being created...:   0%| | 0/10 [00:0stalled Triple MBH instances being created...:  10%| | 1/10 [00:0stalled Triple MBH instances being created...:  20%|▏| 2/10 [00:0stalled Triple MBH instances being created...:  30%|▎| 3/10 [00:1stalled Triple MBH instances being created...:  40%|▍| 4/10 [00:2stalled Triple MBH instances being created...:  50%|▌| 5/10 [00:2stalled Triple MBH instances being created...:  60%|▌| 6/10 [00:3stalled Triple MBH instances being created...:  70%|▋| 7/10 [00:3stalled Triple MBH instances being created...:  80%|▊| 8/10 [00:4stalled Triple MBH instances being created...:  90%|▉| 9/10 [00:4stalled Triple MBH instances being created...: 100%|█| 10/10 [00:stalled Triple MBH instances being created...: 100%|█| 10/10 [00:
-calculating kick velocities for N realizations:   0%| | 0/10 [00:calculating kick velocities for N realizations:  10%| | 1/10 [00:calculating kick velocities for N realizations:  20%|▏| 2/10 [00:calculating kick velocities for N realizations:  30%|▎| 3/10 [01:calculating kick velocities for N realizations:  40%|▍| 4/10 [01:calculating kick velocities for N realizations:  50%|▌| 5/10 [01:calculating kick velocities for N realizations:  60%|▌| 6/10 [02:calculating kick velocities for N realizations:  70%|▋| 7/10 [02:calculating kick velocities for N realizations:  80%|▊| 8/10 [02:calculating kick velocities for N realizations:  90%|▉| 9/10 [03:calculating kick velocities for N realizations: 100%|█| 10/10 [03calculating kick velocities for N realizations: 100%|█| 10/10 [03
-calculating kick velocities for N realizations:   0%| | 0/10 [00:calculating kick velocities for N realizations:  10%| | 1/10 [00:calculating kick velocities for N realizations:  20%|▏| 2/10 [00:calculating kick velocities for N realizations:  30%|▎| 3/10 [00:calculating kick velocities for N realizations:  40%|▍| 4/10 [00:calculating kick velocities for N realizations:  50%|▌| 5/10 [00:calculating kick velocities for N realizations:  60%|▌| 6/10 [00:calculating kick velocities for N realizations:  70%|▋| 7/10 [00:calculating kick velocities for N realizations:  80%|▊| 8/10 [00:calculating kick velocities for N realizations:  90%|▉| 9/10 [00:calculating kick velocities for N realizations: 100%|█| 10/10 [00calculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:   0%| | 0/10 [00:00<?
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  10%| | 1/10 [00:20<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  20%|▏| 2/10 [00:40<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  30%|▎| 3/10 [00:59<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  40%|▍| 4/10 [01:18<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  50%|▌| 5/10 [01:38<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  60%|▌| 6/10 [01:59<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  70%|▋| 7/10 [02:20<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  80%|▊| 8/10 [02:39<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances:  90%|▉| 9/10 [02:58<0
-calculating kick velocities for N realizations:   0%| | 0/10 [00:[A
-calculating kick velocities for N realizations:  10%| | 1/10 [00:[A
-calculating kick velocities for N realizations:  20%|▏| 2/10 [00:[A
-calculating kick velocities for N realizations:  30%|▎| 3/10 [00:[A
-calculating kick velocities for N realizations:  40%|▍| 4/10 [00:[A
-calculating kick velocities for N realizations:  50%|▌| 5/10 [00:[A
-calculating kick velocities for N realizations:  60%|▌| 6/10 [00:[A
-calculating kick velocities for N realizations:  70%|▋| 7/10 [00:[A
-calculating kick velocities for N realizations:  80%|▊| 8/10 [00:[A
-calculating kick velocities for N realizations:  90%|▉| 9/10 [00:[A
-calculating kick velocities for N realizations: 100%|█| 10/10 [00[Acalculating kick velocities for N realizations: 100%|█| 10/10 [00
-assigning kicks to strong triple instances: 100%|█| 10/10 [03:17<assigning kicks to strong triple instances: 100%|█| 10/10 [03:17<
