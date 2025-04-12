@@ -39,3 +39,6 @@ The binary merger files and triple finding files are stored in the parent direct
 2. ```Triple_dynamics.py``` has classes defined for strong triples, isolated binaries and weak triples. In the `strongtriple` class, dynamics or outcomes of their evolution is added based on interpolation with Bonetti simulation data.
 
 3. ```add_MBH_dynamics.ipynb``` is the main notebook that calls all the other functions and make plots which are stored in **~/Triples/Triple-Outcomes/Figures**
+
+
+Slurm script *create_triple_files_N100.slurm* runs 100 instances and storkes the pkl file inside obj_data.
