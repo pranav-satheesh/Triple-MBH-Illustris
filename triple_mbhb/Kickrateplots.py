@@ -1,6 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+import count_vkicks as kickcount
+import os
+
+tex_path = '/apps/texlive/2023/bin/x86_64-linux/'
+os.environ['PATH'] += os.pathsep + tex_path
+
+import scienceplots
+plt.style.use('science')
+import pickle
+
 
 boxsize = 75.0
 omega_m = 0.2726
@@ -156,7 +166,6 @@ def plot_rate_kicks(strong_tr, weak_tr, iso_bin, v_max_values, vbin_sizes, Nruns
     fig.tight_layout()
     
     return fig, ax
-
 
 def plot_N_kicks(df_strong,df_weak,df_binary,thresholds):
      
@@ -441,6 +450,69 @@ def kick_velocity_dist_plot(strong_tr,weak_tr,iso_bin,Nruns):
 
     return fig,ax
 
+def set_plot_style(linewidth=3, titlesize=20,labelsize=25,ticksize=20,legendsize=20,bold=True):
+        """Set matplotlib rcParams for consistent plot style."""
+        font_weight = 'bold' if bold else 'normal'
 
+        plt.rcParams.update({
+            'lines.linewidth': linewidth,
+            'axes.labelsize': labelsize,
+            'axes.titlesize': titlesize,
+            'xtick.labelsize': ticksize,
+            'ytick.labelsize': ticksize,
+            'legend.fontsize': legendsize,
+            'axes.titleweight': font_weight,
+            'axes.labelweight': font_weight,
+            'font.weight': font_weight,
+        })
 
+def import_objects(Nruns):
 
+    iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
+    weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
+    strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
+    stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
+
+    with open(iso_filename, 'rb') as f:
+        iso_bin = pickle.load(f)
+
+    with open(weak_tr_filename, 'rb') as f:
+        weak_tr = pickle.load(f)
+
+    with open(strong_tr_filename, 'rb') as f:
+        strong_tr = pickle.load(f)
+
+    with open(stalled_tr_filename, 'rb') as f:
+        stalled_objs = pickle.load(f)
+
+    return strong_tr, weak_tr, iso_bin, stalled_objs
+
+def kick_velocity_distribution(Nruns):
+    strong_tr,weak_tr,iso_bin,stalled_objs = import_objects(Nruns)
+
+    velocity_bins_gwrecoil = np.logspace(1,4,50) 
+    velocity_bins_sling = np.logspace(1.7,4,20) 
+
+    slingshot_kick_counts = []
+    for i in range(Nruns):
+        sling_kick_N, _ = np.histogram(strong_tr[i].slingshot_kicks,bins=velocity_bins_sling)
+        slingshot_kick_counts.append(sling_kick_N)
+    
+    mean_sling = np.mean(slingshot_kick_counts,axis=0)
+    std_sling = np.std(slingshot_kick_counts,axis=0)
+
+    rand_kick_counts= kickcount.Nvkicks(iso_bin,weak_tr,strong_tr,Nruns,velocity_bins_gwrecoil,kick_type="v_kick_random")
+    hybrid_kick_counts= kickcount.Nvkicks(iso_bin,weak_tr,strong_tr,Nruns,velocity_bins_gwrecoil,kick_type="v_kick_hybrid")
+    aligned_kick_counts = kickcount.Nvkicks(iso_bin,weak_tr,strong_tr,Nruns,velocity_bins_gwrecoil,kick_type="v_kick_aligned")
+
+    kick_types_data = {
+    'random': (rand_kick_counts, velocity_bins_gwrecoil),
+    'hybrid': (hybrid_kick_counts, velocity_bins_gwrecoil),
+    'aligned': (aligned_kick_counts, velocity_bins_gwrecoil),
+    'slingshot': (slingshot_kick_counts, velocity_bins_sling)
+    }
+
+    fig,ax = kickcount.plot_kick_distribution(kick_types_data)
+    return fig,ax
+    
+        
