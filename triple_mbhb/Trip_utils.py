@@ -1,14 +1,54 @@
 
 import numpy as np
+import pickle
 import Triple_dynamics as Tr
+import matplotlib.pyplot as plt
+import scienceplots
+plt.style.use('science')
 
 
-#some utility functions to print some stats
+#some utility functions for other python scripts
+
+def import_objects(Nruns,obj_dir="/orange/lblecha/pranavsatheesh/trip_mbh_objs/"):
+
+    iso_filename = obj_dir+'iso_bin_wkick.pkl'
+    weak_tr_filename = obj_dir+'weak_tr_wkick.pkl'
+    strong_tr_filename = obj_dir+f'tr{Nruns}_wkick.pkl'
+    stalled_tr_filename= obj_dir +f'stalled{Nruns}.pkl'
+
+    # iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
+    # weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
+    # strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
+    # stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
+
+    with open(iso_filename, 'rb') as f:
+        iso_bin = pickle.load(f)
+
+    with open(weak_tr_filename, 'rb') as f:
+        weak_tr = pickle.load(f)
+
+    with open(strong_tr_filename, 'rb') as f:
+        strong_tr = pickle.load(f)
+
+    with open(stalled_tr_filename, 'rb') as f:
+        stalled_objs = pickle.load(f)
+
+    total_systems = strong_tr[0].N_strong_triples + iso_bin.N_iso_binaries + weak_tr.N_weak_triples
+    print(f"Total number of MBH systems is {total_systems}")
+    print(f"Number of iso binaries is {iso_bin.N_iso_binaries} and it is {iso_bin.N_iso_binaries/total_systems*100:.2f} %")
+    print(f"Number of weak triples is {weak_tr.N_weak_triples} and it is {weak_tr.N_weak_triples/total_systems*100:.2f} %")
+    print(f"Number of strong triples is {strong_tr[0].N_strong_triples} and it is {strong_tr[0].N_strong_triples/total_systems*100:.2f} %")
+
+    print("------------------")
+    #print the stats for strong triples
+    Trip_stats(strong_tr)
+
+    return strong_tr, weak_tr, iso_bin, stalled_objs
 
 def Trip_stats(Trip_objs):
 
     Nruns = len(Trip_objs)
-    tota_strong_Trip = 520
+    tota_strong_Trip = Trip_objs[0].N_strong_triples
 
     Prompt_mergers_avg = 0
     mergers_after_ejection_avg = 0
@@ -42,6 +82,15 @@ def Trip_stats(Trip_objs):
 
     return total_mergers_avg
 
+def find_exchange_events_in_strong_triple(Nruns,strong_tr,weak_tr_obj,iso_bin_obj):
+    exchanges_Tr_ej = []
+    exchanges = []
+    for i in range(Nruns):
+        scatter_event_mask = (strong_tr[i].a_triple_after<=strong_tr[i].a_triple_ovtks_ill)
+        exchanges.append(np.sum(~scatter_event_mask))
+        exchanges_Tr_ej.append(np.sum((~scatter_event_mask)&strong_tr[i].merger_after_ejection_mask))
+
+    print(f"{np.mean(exchanges_Tr_ej)/189 * 100:.2f} % are exchange events in mergers after kick")
 
 def ejection_effects(Trip_objs,weak_tr_obj,iso_bin_obj):
 
@@ -67,4 +116,21 @@ def ejection_effects(Trip_objs,weak_tr_obj,iso_bin_obj):
         print("----------------")
 
     return iso_inv,weak_inv,strong_inv
+
+def set_plot_style(linewidth=3, titlesize=20,labelsize=25,ticksize=20,legendsize=20,bold=True):
+        """Set matplotlib rcParams for consistent plot style."""
+        font_weight = 'bold' if bold else 'normal'
+
+        plt.rcParams.update({
+            'lines.linewidth': linewidth,
+            'axes.labelsize': labelsize,
+            'axes.titlesize': titlesize,
+            'xtick.labelsize': ticksize,
+            'ytick.labelsize': ticksize,
+            'legend.fontsize': legendsize,
+            'axes.titleweight': font_weight,
+            'axes.labelweight': font_weight,
+            'font.weight': font_weight,
+        })
+
 

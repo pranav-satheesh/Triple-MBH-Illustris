@@ -355,3 +355,51 @@ def plot_ejection_fractions(accumulated_fractions, bin_centers, kick_colors):
     ax.set_ylabel("Fraction of ejections", fontsize=35)
     plt.show()
 
+def calculate_relative_ejections(strong_tr,weak_triso_bin, Nruns, N_kick_realization, gwrecoil_kick_type, binsizes, lgzmin, lgzmax, Nmergers_thresh):
+
+    '''calculate the relative fraction of ejection of slingshot kicks compared to the GW recoil for a spin type'''
+
+    # Calculate the fraction of ejection for the slingshot kicks compared to the GW recoil kicks in redshift bins
+    
+    
+    for i in range(Nruns):
+
+        #slingshot_ejection_redshifts
+        lgz_sling_ejec = np.log10(
+                strong_tr[i].z_triple_merger[
+                    (strong_tr[i].ejection_slingshot_mask) & (strong_tr[i].merger_mask)
+                ]
+            )                          
+        
+    for kick_type in kick_types:
+        for j in range(N_kick_realization):
+            Ejections_per_realization = []
+            for i in range(Nruns):
+                lgz_ejec = np.concatenate([
+                        np.log10(strong_tr[i].z_triple_merger[strong_tr[i].merger_mask][getattr(strong_tr[i], f"ejection_{kick_type}_mask")[j]]),
+                        np.log10(iso_bin.z_merger[iso_bin.merger_mask][getattr(iso_bin, f"ejection_{kick_type}_mask")[j]]),
+                        np.log10(weak_tr.z_merger[weak_tr.merger_mask][getattr(weak_tr, f"ejection_{kick_type}_mask")[j]])
+                    ])
+            
+
+
+    
+    
+    slingshot_fractions, slingshot_bin_centers = calculate_fraction_ejection(
+        strong_tr, weak_tr, iso_bin, Nruns, N_kick_realization, 
+        kick_types=['slingshot'], binsizes=binsizes, lgzmin=lgzmin, lgzmax=lgzmax, 
+        Nmergers_thresh=Nmergers_thresh
+    )
+
+    gwrecoil_fractions, gwrecoil_bin_centers = calculate_fraction_ejection(
+        strong_tr, weak_tr, iso_bin, Nruns, N_kick_realization, 
+        kick_types=[gwrecoil_kick_type], binsizes=binsizes, lgzmin=lgzmin, lgzmax=lgzmax, 
+        Nmergers_thresh=Nmergers_thresh
+    )
+
+    # Calculate the relative fraction of slingshot ejections compared to GW recoil ejections
+    relative_fractions = {}
+    for i in range(len(slingshot_fractions['slingshot'])):
+        relative_fractions[i] = slingshot_fractions['slingshot'][i] / gwrecoil_fractions[gwrecoil_kick_type][i]
+
+    return relative_fractions, slingshot_bin_centers['slingshot']
