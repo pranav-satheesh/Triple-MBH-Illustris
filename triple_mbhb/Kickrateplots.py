@@ -49,9 +49,9 @@ def Nkicks(strong_tr,weak_tr,iso_bin,thresh,Nruns):
         hybrid_v = np.concatenate((hybrid_v_strong,hybrid_v_iso,hybrid_v_weak))
         #hybrid_v = np.array(hybrid_v)
 
-        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_5deg if kick > thresh]
-        deg5_v_weak = [kick for kick in weak_tr.gw_kick_5deg if kick > thresh]
-        deg5_v_iso = [kick for kick in iso_bin.gw_kick_5deg if kick > thresh]
+        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_aligned if kick > thresh]
+        deg5_v_weak = [kick for kick in weak_tr.gw_kick_aligned if kick > thresh]
+        deg5_v_iso = [kick for kick in iso_bin.gw_kick_aligned if kick > thresh]
         deg5_v = np.concatenate((deg5_v_strong,deg5_v_iso,deg5_v_weak))
         #deg5_v = np.array(deg5_v)
 
@@ -107,13 +107,13 @@ def dNbydV(strong_tr, weak_tr, iso_bin, v_max_values, vbin_sizes, Nruns):
         vbins_hybrid.append(vbin_edges_hybrid[:-1] + 0.5 * vbin_sizes['hybrid'])
 
         # Aligned kicks
-        dNv_deg5_strong, vbin_edges_deg5 = np.histogram(strong_tr[i].gw_kick_5deg, 
+        dNv_deg5_strong, vbin_edges_deg5 = np.histogram(strong_tr[i].gw_kick_aligned, 
                                                           range=(0, v_max_values['deg5']), 
                                                           bins=int(v_max_values['deg5'] / vbin_sizes['deg5']))
-        dNv_deg5_weak, _ = np.histogram(weak_tr.gw_kick_5deg, 
+        dNv_deg5_weak, _ = np.histogram(weak_tr.gw_kick_aligned, 
                                          range=(0, v_max_values['deg5']), 
                                          bins=int(v_max_values['deg5'] / vbin_sizes['deg5']))
-        dNv_deg5_binary, _ = np.histogram(iso_bin.gw_kick_5deg, 
+        dNv_deg5_binary, _ = np.histogram(iso_bin.gw_kick_aligned, 
                                            range=(0, v_max_values['deg5']), 
                                            bins=int(v_max_values['deg5'] / vbin_sizes['deg5']))
         dNbydV_deg5.append((dNv_deg5_binary + dNv_deg5_strong + dNv_deg5_weak) / vbin_sizes['deg5'])
@@ -328,9 +328,9 @@ def Prob_kick(strong_tr,weak_tr,iso_bin,Nruns,N_v=50):
         hybrid_v_iso = [kick for kick in iso_bin.gw_kick_hybrid if kick > 0]
         hybrid_v = np.concatenate((hybrid_v_strong,hybrid_v_iso,hybrid_v_weak))
 
-        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_5deg if kick > 0]
-        deg5_v_weak = [kick for kick in weak_tr.gw_kick_5deg if kick > 0]
-        deg5_v_iso = [kick for kick in iso_bin.gw_kick_5deg if kick > 0]
+        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_aligned if kick > 0]
+        deg5_v_weak = [kick for kick in weak_tr.gw_kick_aligned if kick > 0]
+        deg5_v_iso = [kick for kick in iso_bin.gw_kick_aligned if kick > 0]
         deg5_v = np.concatenate((deg5_v_strong,deg5_v_iso,deg5_v_weak))
 
         sling_p = [(sling_v > vth).sum() / len(sling_v) for vth in vth_values]
@@ -403,9 +403,9 @@ def kick_velocity_dist_plot(strong_tr,weak_tr,iso_bin,Nruns):
         hybrid_max.append(np.max(hybrid_v))
         hybrid_g600.append(len(hybrid_v[hybrid_v>600])/len(hybrid_v))        
 
-        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_5deg if kick > 0]
-        deg5_v_weak = [kick for kick in weak_tr.gw_kick_5deg if kick > 0]
-        deg5_v_iso = [kick for kick in iso_bin.gw_kick_5deg if kick > 0]
+        deg5_v_strong = [kick for kick in strong_tr[i].gw_kick_aligned if kick > 0]
+        deg5_v_weak = [kick for kick in weak_tr.gw_kick_aligned if kick > 0]
+        deg5_v_iso = [kick for kick in iso_bin.gw_kick_aligned if kick > 0]
         deg5_v = np.concatenate((deg5_v_strong,deg5_v_iso,deg5_v_weak))
         deg5_v = np.array(deg5_v)
         deg5_max.append(np.max(deg5_v))
@@ -466,12 +466,17 @@ def set_plot_style(linewidth=3, titlesize=20,labelsize=25,ticksize=20,legendsize
             'font.weight': font_weight,
         })
 
-def import_objects(Nruns):
+def import_objects(Nruns,obj_dir="/orange/lblecha/pranavsatheesh/trip_mbh_objs/"):
 
-    iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
-    weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
-    strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
-    stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
+    iso_filename = obj_dir+'iso_bin_wkick.pkl'
+    weak_tr_filename = obj_dir+'weak_tr_wkick.pkl'
+    strong_tr_filename = obj_dir+f'tr{Nruns}_wkick.pkl'
+    stalled_tr_filename= obj_dir +f'stalled{Nruns}.pkl'
+
+    # iso_filename = os.path.abspath('../obj_data/iso_bin_wkick.pkl')
+    # weak_tr_filename = os.path.abspath('../obj_data/weak_tr_wkick.pkl')
+    # strong_tr_filename =os.path.abspath(f'../obj_data/tr{Nruns}_wkick.pkl')
+    # stalled_tr_filename=os.path.abspath(f'../obj_data/stalled{Nruns}.pkl')
 
     with open(iso_filename, 'rb') as f:
         iso_bin = pickle.load(f)
@@ -515,4 +520,266 @@ def kick_velocity_distribution(Nruns):
     fig,ax = kickcount.plot_kick_distribution(kick_types_data)
     return fig,ax
     
+# kick statistics
+
+def kick_statistics(Nruns):
+    strong_tr, weak_tr, iso_bin, stalled_objs = import_objects(Nruns)
+
+    # Calculate the maximum kick values
+    max_kicks = max_kick_values(strong_tr, weak_tr, iso_bin, Nruns)
+    print("--------")
+    
+    # Calculate the median kick values
+    median_kicks = median_kick_values(strong_tr, weak_tr, iso_bin, Nruns)
+    print("--------")
+    # Calculate the kick percentiles
+    kick_percentiles_results = kick_percentiles(strong_tr, weak_tr, iso_bin, Nruns)
+
+    return max_kicks, median_kicks, kick_percentiles_results
+
+def max_kick_values(strong_tr, weak_tr, iso_bin, Nruns):
+    max_kicks = {
+        'slingshot': [],
+        'random': [],
+        'hybrid': [],
+        'aligned': []
+    }
+
+    for i in range(Nruns):
+        max_kicks['slingshot'].append(np.max(strong_tr[i].slingshot_kicks))
+        max_kicks['random'].append(np.max(np.concatenate((iso_bin.v_kick_random, weak_tr.v_kick_random, strong_tr[i].v_kick_random), axis=1)))
+        max_kicks['aligned'].append(np.max(np.concatenate((iso_bin.v_kick_aligned, weak_tr.v_kick_aligned, strong_tr[i].v_kick_aligned), axis=1)))
+        max_kicks['hybrid'].append(np.max(np.concatenate((iso_bin.v_kick_hybrid, weak_tr.v_kick_hybrid, strong_tr[i].v_kick_hybrid), axis=1)))
+    
+    #Also the standard errors
+
+    std_err_random = np.std(max_kicks['random']) / np.sqrt(len(max_kicks['random']))
+    std_err_aligned = np.std(max_kicks['aligned']) / np.sqrt(len(max_kicks['aligned']))
+    std_err_hybrid = np.std(max_kicks['hybrid']) / np.sqrt(len(max_kicks['hybrid']))
+    std_err_slingshot = np.std(max_kicks['slingshot']) / np.sqrt(len(max_kicks['slingshot']))
+
+    print(f"The maximum kick produced by GW recoil using random spins is {np.mean(max_kicks['random']):.2f} ± {std_err_random:.2f} km/s")
+    print(f"The maximum kick produced by GW recoil using aligned spins is {np.mean(max_kicks['aligned']):.2f} ± {std_err_aligned:.2f} km/s")
+    print(f"The maximum kick produced by GW recoil using hybrid spins is {np.mean(max_kicks['hybrid']):.2f} ± {std_err_hybrid:.2f} km/s")
+    print(f"The maximum kick produced by slingshot using random spins is {np.mean(max_kicks['slingshot']):.2f} ± {std_err_slingshot:.2f} km/s")
+
+    return max_kicks
+    
+def median_kick_values(strong_tr, weak_tr, iso_bin, Nruns):
+    median_kicks = {
+        'slingshot': [],
+        'random': [],
+        'hybrid': [],
+        'aligned': []
+    }
+
+    for i in range(Nruns):
+        median_kicks['slingshot'].append(np.median(strong_tr[i].slingshot_kicks))
+        median_kicks['random'].append(np.median(np.concatenate((iso_bin.v_kick_random, 
+                                                     weak_tr.v_kick_random, 
+                                                     strong_tr[i].v_kick_random), axis=1)))
+        median_kicks['hybrid'].append(np.median(np.concatenate((iso_bin.v_kick_hybrid,
+                                                     weak_tr.v_kick_hybrid, 
+                                                     strong_tr[i].v_kick_hybrid), axis=1)))
+        median_kicks['aligned'].append(np.median(np.concatenate((iso_bin.v_kick_aligned,
+                                                     weak_tr.v_kick_aligned, 
+                                                     strong_tr[i].v_kick_aligned), axis=1)))
         
+    std_err_random = np.std(median_kicks['random']) / np.sqrt(len(median_kicks['random']))
+    std_err_aligned = np.std(median_kicks['aligned']) / np.sqrt(len(median_kicks['aligned']))
+    std_err_hybrid = np.std(median_kicks['hybrid']) / np.sqrt(len(median_kicks['hybrid']))
+    std_err_slingshot = np.std(median_kicks['slingshot']) / np.sqrt(len(median_kicks['slingshot']))
+
+    print(f"The median kick produced by GW recoil using random spins is {np.mean(median_kicks['random']):.2f} ± {std_err_random:.2f} km/s")
+    print(f"The median kick produced by GW recoil using aligned spins is {np.mean(median_kicks['aligned']):.2f} ± {std_err_aligned:.2f} km/s")
+    print(f"The median kick produced by GW recoil using hybrid spins is {np.mean(median_kicks['hybrid']):.2f} ± {std_err_hybrid:.2f} km/s")
+    print(f"The median kick produced by slingshot using random spins is {np.mean(median_kicks['slingshot']):.2f} ± {std_err_slingshot:.2f} km/s")
+
+    return median_kicks
+
+def kick_percentiles(strong_tr, weak_tr, iso_bin, Nruns, thresholds=(500, 1000)):
+    """
+    Calculate the percentage of kicks above given thresholds for each kick model.
+
+    Parameters:
+        strong_tr: list of strong triple objects (length Nruns)
+        weak_tr: weak triple object
+        iso_bin: isolated binary object
+        Nruns: number of runs
+        n_slingshot_run: number of triples realization (default 520)
+        thresholds: tuple of thresholds (default (500, 1000))
+
+    Returns:
+        results: dict with mean and std for each model and threshold
+    """
+    results = {}
+    Nslingshot_kick = len(strong_tr[0].slingshot_kicks)
+    for thresh in thresholds:
+        random_percentile = []
+        random_percentile_std = []
+        hybrid_percentile = []
+        hybrid_percentile_std = []
+        aligned_percentile = []
+        aligned_percentile_std = []
+        slingshot_percentile = []
+
+        for i in range(Nruns):
+            # Total number of kicks
+            N_kicks_i = (
+                np.shape(iso_bin.v_kick_random)[1] +
+                np.shape(weak_tr.v_kick_random)[1] +
+                np.shape(strong_tr[i].v_kick_random)[1]
+            )
+
+            # Random kicks above threshold
+            N_rand_above = (
+                np.sum(np.array(iso_bin.v_kick_random) > thresh, axis=1) +
+                np.sum(np.array(weak_tr.v_kick_random) > thresh, axis=1) +
+                np.sum(np.array(strong_tr[i].v_kick_random) > thresh, axis=1)
+            )
+            random_percentile.append(np.mean(N_rand_above / N_kicks_i * 100))
+            random_percentile_std.append(np.std(N_rand_above / N_kicks_i * 100))
+
+            # Hybrid kicks above threshold
+            N_hybrid_above = (
+                np.sum(np.array(iso_bin.v_kick_hybrid) > thresh, axis=1) +
+                np.sum(np.array(weak_tr.v_kick_hybrid) > thresh, axis=1) +
+                np.sum(np.array(strong_tr[i].v_kick_hybrid) > thresh, axis=1)
+            )
+            hybrid_percentile.append(np.mean(N_hybrid_above / N_kicks_i * 100))
+            hybrid_percentile_std.append(np.std(N_hybrid_above / N_kicks_i * 100))
+
+            # Aligned kicks above threshold
+            N_aligned_above = (
+                np.sum(np.array(iso_bin.v_kick_aligned) > thresh, axis=1) +
+                np.sum(np.array(weak_tr.v_kick_aligned) > thresh, axis=1) +
+                np.sum(np.array(strong_tr[i].v_kick_aligned) > thresh, axis=1)
+            )
+            aligned_percentile.append(np.mean(N_aligned_above / N_kicks_i * 100))
+            aligned_percentile_std.append(np.std(N_aligned_above / N_kicks_i * 100))
+
+            # Slingshot kicks above threshold (only for strong_tr[i])
+            N_slingshot_above = np.sum(np.array(strong_tr[i].slingshot_kicks) > thresh)
+            slingshot_percentile.append(N_slingshot_above /Nslingshot_kick * 100)
+
+        results[thresh] = {
+            'random': (np.mean(random_percentile), np.mean(random_percentile_std)),
+            'hybrid': (np.mean(hybrid_percentile), np.mean(hybrid_percentile_std)),
+            'aligned': (np.mean(aligned_percentile), np.mean(aligned_percentile_std)),
+            'slingshot': (np.mean(slingshot_percentile), np.std(slingshot_percentile)),
+        }
+
+    # Print results
+    for thresh in thresholds:
+        print(f"The % of kicks above {thresh} in random model is {results[thresh]['random'][0]:.2f} ± {results[thresh]['random'][1]:.2f} %")
+        print(f"The % of kicks above {thresh} in hybrid model is {results[thresh]['hybrid'][0]:.2f} ± {results[thresh]['hybrid'][1]:.2f} %")
+        print(f"The % of kicks above {thresh} in aligned model is {results[thresh]['aligned'][0]:.2f} ± {results[thresh]['aligned'][1]:.2f} %")
+        print(f"The % of kicks above {thresh} in slingshot model is {results[thresh]['slingshot'][0]:.2f} ± {results[thresh]['slingshot'][1]:.2f} %")
+        print("----------")
+
+    return results
+
+def count_kicks_in_range(v_min, v_max, Nruns, iso_bin, weak_tr, strong_tr):
+    """
+    Count the average number of kicks in the velocity range [v_min, v_max] for each kick model.
+
+    Parameters:
+        v_min (float): Minimum velocity (inclusive).
+        v_max (float): Maximum velocity (inclusive).
+        Nruns (int): Number of runs.
+        iso_bin: Isolated binary object.
+        weak_tr: Weak triple object.
+        strong_tr: List of strong triple objects (length Nruns).
+
+    Returns:
+        dict: Average number of kicks in the range for each model.
+    """
+    kicks_in_range_random = []
+    kicks_in_range_hybrid = []
+    kicks_in_range_aligned = []
+    kicks_in_range_slingshot = []
+
+    for i in range(Nruns):
+        # Random spins
+        random_kicks = np.concatenate((iso_bin.v_kick_random, 
+                                       weak_tr.v_kick_random, 
+                                       strong_tr[i].v_kick_random), axis=1)
+        kicks_in_range_random.append(np.sum((random_kicks >= v_min) & (random_kicks <= v_max)))
+
+        # Hybrid spins
+        hybrid_kicks = np.concatenate((iso_bin.v_kick_hybrid, 
+                                       weak_tr.v_kick_hybrid, 
+                                       strong_tr[i].v_kick_hybrid), axis=1)
+        kicks_in_range_hybrid.append(np.sum((hybrid_kicks >= v_min) & (hybrid_kicks <= v_max)))
+
+        # Aligned spins
+        aligned_kicks = np.concatenate((iso_bin.v_kick_aligned, 
+                                        weak_tr.v_kick_aligned, 
+                                        strong_tr[i].v_kick_aligned), axis=1)
+        kicks_in_range_aligned.append(np.sum((aligned_kicks >= v_min) & (aligned_kicks <= v_max)))
+
+        # Slingshot kicks
+        slingshot_kicks = np.array(strong_tr[i].slingshot_kicks)
+        kicks_in_range_slingshot.append(np.sum((slingshot_kicks >= v_min) & (slingshot_kicks <= v_max)))
+
+    # Print the results
+
+    kicks_in_range_results = { 
+        "random": np.mean(kicks_in_range_random),
+        "hybrid": np.mean(kicks_in_range_hybrid),
+        "aligned": np.mean(kicks_in_range_aligned),
+        "slingshot": np.mean(kicks_in_range_slingshot)
+    }
+    
+    print(f"The number of kicks in the {v_min}-{v_max} km/s range for random spins is {kicks_in_range_results['random']}")
+    print(f"The number of kicks in the {v_min}-{v_max} km/s range for hybrid spins is {kicks_in_range_results['hybrid']}")
+    print(f"The number of kicks in the {v_min}-{v_max} km/s range for aligned spins is {kicks_in_range_results['aligned']}")
+    print(f"The number of kicks in the {v_min}-{v_max} km/s range for slingshot is {kicks_in_range_results['slingshot']}")
+
+    
+    return kicks_in_range_results
+
+def compute_ejection_percentages(Nruns, iso_bin, weak_tr, strong_tr):
+    random_ejections = []
+    hybrid_ejections = []
+    aligned_ejections = []
+    slingshot_ejections = []
+
+    for i in range(Nruns):
+        # Total number of kicks
+        N_kicks = (np.shape(iso_bin.v_kick_random)[1]) + (np.shape(weak_tr.v_kick_random)[1]) + (np.shape(strong_tr[i].v_kick_random)[1])
+        N_sling_kicks = 520  # Slingshot kicks per iteration
+
+        # Calculate ejections for random spins
+        random_eject = (
+            np.sum(iso_bin.v_kick_random > iso_bin.Vescape[iso_bin.merger_mask], axis=1) +
+            np.sum(weak_tr.v_kick_random > weak_tr.Vescape[weak_tr.merger_mask], axis=1) +
+            np.sum(strong_tr[i].v_kick_random > strong_tr[i].Vescape[strong_tr[i].merger_mask], axis=1)
+        ) / N_kicks * 100
+        random_ejections.append(random_eject)
+
+        # Calculate ejections for hybrid spins
+        hybrid_eject = (
+            np.sum(iso_bin.v_kick_hybrid > iso_bin.Vescape[iso_bin.merger_mask], axis=1) +
+            np.sum(weak_tr.v_kick_hybrid > weak_tr.Vescape[weak_tr.merger_mask], axis=1) +
+            np.sum(strong_tr[i].v_kick_hybrid > strong_tr[i].Vescape[strong_tr[i].merger_mask], axis=1)
+        ) / N_kicks * 100
+        hybrid_ejections.append(hybrid_eject)
+
+        # Calculate ejections for aligned spins
+        aligned_eject = (
+            np.sum(iso_bin.v_kick_aligned > iso_bin.Vescape[iso_bin.merger_mask], axis=1) +
+            np.sum(weak_tr.v_kick_aligned > weak_tr.Vescape[weak_tr.merger_mask], axis=1) +
+            np.sum(strong_tr[i].v_kick_aligned > strong_tr[i].Vescape[strong_tr[i].merger_mask], axis=1)
+        ) / N_kicks * 100
+        aligned_ejections.append(aligned_eject)
+
+        # Slingshot kicks
+        slingshot_eject = np.sum(strong_tr[i].slingshot_kicks > strong_tr[i].Vescape) / N_sling_kicks * 100
+        slingshot_ejections.append(slingshot_eject)
+
+    print(f"Random ejection percentage: {np.mean(random_ejections):.2f}% ± {np.std(random_ejections):.2f}%")
+    print(f"Hybrid ejection percentage: {np.mean(hybrid_ejections):.2f}% ± {np.std(hybrid_ejections):.2f}%")
+    print(f"Aligned ejection percentage: {np.mean(aligned_ejections):.2f}% ± {np.std(aligned_ejections):.2f}%")
+    print(f"Slingshot ejection percentage: {np.mean(slingshot_ejections):.2f}% ± {np.std(slingshot_ejections):.2f}%")
+    return None
