@@ -1,4 +1,16 @@
 import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+import scipy as sp
+import matplotlib as mpl
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+# tex_path = '/apps/texlive/2023/bin/x86_64-linux/'
+# os.environ['PATH'] += os.pathsep + tex_path
+# import scienceplots
+# plt.style.use('science')
+
 
 def M_q_z_dist_for_mergers(strong_tr,weak_tr,iso_bin,Nruns):
 
@@ -101,4 +113,155 @@ def median_values_q_M_z(strong_tr,weak_tr,iso_bin,Nruns):
 
     return None 
 
+def plot_hist_q_M_z(lgq_bins, lgM_bins, lgz_bins, Nqmerger, NMmerger, Nzmerger):
+    color_palette = {
+        "strong_trip": "#377eb8",
+        "weak_trip": "#a2c8ec",
+        "iso": "#ff800e",
+        "all": "#898989",
+        "stalled": 'red'
+    }
 
+    fig, ax = plt.subplots(1, 3, figsize=[10, 4], sharey=True)
+
+    # Plot q distribution
+    ax[0].step(lgq_bins, Nqmerger[0], label="isolated binaries", color=color_palette["iso"])
+    ax[0].step(lgq_bins, Nqmerger[1], label="weak triples", color=color_palette["weak_trip"])
+    ax[0].step(lgq_bins, Nqmerger[2], label="strong triples", color=color_palette["strong_trip"])
+    ax[0].set_xticks([-4, -3, -2, -1, 0])
+    ax[0].set_xlim(-4.2, 0)
+    ax[0].set_ylim(0,)
+    ax[0].set_xlabel(r"$\log(q_{\text{mrg}})$")
+    ax[0].set_ylabel("pdf")
+
+    # Plot M distribution
+    ax[1].step(lgM_bins, NMmerger[0], label="isolated binaries", color=color_palette["iso"])
+    ax[1].step(lgM_bins, NMmerger[1], label="weak triples", color=color_palette["weak_trip"])
+    ax[1].step(lgM_bins, NMmerger[2], label="strong triples", color=color_palette["strong_trip"])
+    ax[1].set_xlabel(r"$\log(M_{\text{mrg}})$")
+    ax[1].set_xticks([6, 7, 8, 9, 10])
+
+    # Plot z distribution
+    ax[2].step(lgz_bins, Nzmerger[0], label="isolated binaries", color=color_palette["iso"])
+    ax[2].step(lgz_bins, Nzmerger[1], label="weak triples", color=color_palette["weak_trip"])
+    ax[2].step(lgz_bins, Nzmerger[2], label="strong triples", color=color_palette["strong_trip"])
+    ax[2].set_xlabel(r"$\log(z)$")
+    ax[2].set_xticks([-3, -2, -1, 0, 1])
+
+    # Add legend and adjust layout
+    ax[0].legend()
+    fig.tight_layout()
+
+    return fig, ax
+
+def strong_Tr_major_mergers(Nruns,strong_tr):
+    st_major_merger = []
+    for i in range(Nruns):
+        st_major_merger.append(np.sum(strong_tr[i].qin_merger[strong_tr[i].merger_mask]>0.1)/520 * 100)
+    print(f"The strong triple mergers consist of {np.mean(st_major_merger):.1f}% major mergers")
+
+def strong_Tr_make_2d_hist_qin_qout(Nruns,strong_tr):
+    hist_Tr_ej_tot = 0
+    hist_Tr_tot = 0
+    hist_no_tot = 0
+
+    for i in range(Nruns):
+        Tr_ej_qin = strong_tr[i].qin[strong_tr[i].merger_after_ejection_mask]
+        Tr_ej_qout = strong_tr[i].qout[strong_tr[i].merger_after_ejection_mask]
+
+        Tr_qin = strong_tr[i].qin[strong_tr[i].prompt_merger_mask]
+        Tr_qout = strong_tr[i].qout[strong_tr[i].prompt_merger_mask]
+
+        no_qin = strong_tr[i].qin[strong_tr[i].no_merger_mask]
+        no_qout = strong_tr[i].qout[strong_tr[i].no_merger_mask]
+
+        
+        xedges =  np.linspace(-3,2,21) #logspace(aa, 21)
+        yedges =  np.linspace(-2,0,21)#logspace(bb, 21)
+
+        aa_Tr, bb_Tr = np.log10(Tr_qout),np.log10(Tr_qin)
+        hist_Tr, *_ = sp.stats.binned_statistic_2d(aa_Tr, bb_Tr, None, bins=(xedges, yedges), statistic='count')
+        hist_Tr_tot = hist_Tr_tot + hist_Tr
+
+        aa_Tr_ej, bb_Tr_ej = np.log10(Tr_ej_qout),np.log10(Tr_ej_qin)
+        hist_Tr_ej, *_ = sp.stats.binned_statistic_2d(aa_Tr_ej, bb_Tr_ej, None, bins=(xedges, yedges), statistic='count')
+        hist_Tr_ej_tot = hist_Tr_ej_tot + hist_Tr_ej
+
+
+        aa_no, bb_no = np.log10(no_qout),np.log10(no_qin)
+        hist_no, *_ = sp.stats.binned_statistic_2d(aa_no, bb_no, None, bins=(xedges, yedges), statistic='count')
+        hist_no_tot = hist_no_tot + hist_no
+    
+    hist_Tr_ej_tot = hist_Tr_ej_tot/Nruns
+    hist_Tr_tot = hist_Tr_tot/Nruns
+    hist_no_tot = hist_no_tot/Nruns
+
+    return xedges, yedges, hist_Tr_tot, hist_Tr_ej_tot, hist_no_tot
+
+def plot_Tr_2d_hist_qin_qout(Nruns,strong_tr,scatter_size=3,scatter_alpha=0.5): 
+
+
+    fig,axes = plt.subplots(1,2,figsize=[16,7])
+    xedges, yedges, hist_Tr_tot, hist_Tr_ej_tot, hist_no_tot = strong_Tr_make_2d_hist_qin_qout(Nruns,strong_tr)
+
+
+    xx, yy = np.meshgrid(xedges, yedges)
+    #norm = mpl.colors.Normalize(0,round(hist_Tr_tot.max()))
+
+    max_val = max(hist_Tr_tot.max(), hist_Tr_ej_tot.max())
+    norm = mpl.colors.Normalize(0, round(max_val))
+
+    pcm1 = axes[0].pcolormesh(xedges, yedges, hist_Tr_tot.T, cmap="Blues", norm=norm)
+    pcm2 = axes[1].pcolormesh(xedges, yedges, hist_Tr_ej_tot.T, cmap="Blues", norm=norm)
+    #plt.colorbar(pcm, ax=axes[0], label='number')
+
+    for i in range(Nruns):
+        qout_stalled_but_Tr = strong_tr[i].qout[(~strong_tr[i].bin_merge_flag)&(strong_tr[i].prompt_merger_mask)]
+        qin_stalled_but_Tr = strong_tr[i].qin[(~strong_tr[i].bin_merge_flag)&(strong_tr[i].prompt_merger_mask)]
+
+        qout_stalled_but_Tr_ej = strong_tr[i].qout[(~strong_tr[i].bin_merge_flag)&(strong_tr[i].merger_after_ejection_mask)]
+        qin_stalled_but_Tr_ej = strong_tr[i].qin[(~strong_tr[i].bin_merge_flag)&(strong_tr[i].merger_after_ejection_mask)]
+
+        axes[0].scatter(np.log10(qout_stalled_but_Tr),np.log10(qin_stalled_but_Tr),s=scatter_size,color="red",alpha=scatter_alpha)
+        axes[1].scatter(np.log10(qout_stalled_but_Tr_ej),np.log10(qin_stalled_but_Tr_ej),s=scatter_size,color="red",alpha=scatter_alpha)
+        if i == 0:  # Add label for legend without plotting scatter
+            axes[0].scatter([], [], s=2, color="red", alpha=1,label="Binaries stalled in isolation")
+            axes[1].scatter([], [], s=2, color="red", alpha=1,label="Binaries stalled in isolation")
+
+
+    divider = make_axes_locatable(axes[1])  # Adjust based on the third axis
+    cax = divider.append_axes("right", size="5%", pad=0.5)
+    plt.colorbar(pcm1, cax=cax, label="number")
+
+    axes[0].set_xlabel("$\log_{10}(q_{out})$")
+    axes[1].set_xlabel("$\log_{10}(q_{out})$")
+
+
+    axes[0].set_ylabel("$\log_{10}(q_{in})$")
+    axes[1].set_ylabel("$\log_{10}(q_{in})$")
+
+
+    axes[0].set_title("Prompt Mergers")
+    axes[1].set_title("Mergers after kick")
+
+    # Add legends to both plots, outside axes with a border
+    legend_props = dict(edgecolor="black", linewidth=1.5)  # Custom border
+
+    #axes[0].legend(prop=legend_props, fancybox=True)
+    axes[0].legend(fancybox=True, framealpha=0.5, frameon=True, edgecolor="black")
+
+    axes[0].set_ylim(-1,0)
+    axes[0].set_xlim(-2.5,1.5)
+    axes[1].set_ylim(-1,0)
+    axes[1].set_xlim(-2.5,1.5)
+
+    plt.tight_layout()
+    return fig,axes
+
+
+def print_isolate_binary_but_Tr_merged_stats(nruns,strong_tr):
+    Tr_merger_stalled_isolated_avg = np.mean([np.sum([(~strong_tr[i].bin_merge_flag) & (strong_tr[i].prompt_merger_mask)])/np.sum(strong_tr[i].prompt_merger_mask) for i in range(nruns)])
+    Tr_ej_merger_stalled_isolated_avg = np.mean([np.sum([(~strong_tr[i].bin_merge_flag) & (strong_tr[i].merger_after_ejection_mask)])/np.sum(strong_tr[i].merger_after_ejection_mask) for i in range(nruns)])
+    print("%.2f%% of prompt mergers would be binaries that would otherwise have stalled in isolation" % (Tr_merger_stalled_isolated_avg * 100))
+    print("%.2f%% of merger after ejections would be binaries that would otherwise have stalled in isolation" % (Tr_ej_merger_stalled_isolated_avg * 100))
+ 
