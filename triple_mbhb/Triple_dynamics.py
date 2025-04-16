@@ -16,9 +16,9 @@ from astropy import units as u
 from astropy import constants as const
 
 import matplotlib.pyplot as plt
-import scienceplots
-plt.style.use(['science']) 
-plt.rcParams.update({'font.size': 20})
+# import scienceplots
+# plt.style.use(['science']) 
+# plt.rcParams.update({'font.size': 20})
 
 import h5py
 
@@ -769,7 +769,7 @@ def find_invalid_mergers(strong_tr,weak_tr,iso_bin,gw_kick_key):
         
     return iso_invalid_merger_mask,weak_triple_invalid_merger_mask,strong_triple_invalid_merger_mask
 
-def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns):
+def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns,merger_rates_path):
 
     color_palette = {"strong_trip":"#377eb8","weak_trip":"#a2c8ec","iso":"#ff800e","all":"#898989","stalled":'red'}
 
@@ -811,8 +811,8 @@ def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns):
     ax[0].set_ylim(1e-8,1)
     ax[0].set_yticks([1e-1,1e-3,1e-5,1e-7])
     ax[0].set_xticks(np.arange(-3,1.5,1))
-    ax[0].set_xlabel("$\log z$",fontsize=20)
-    ax[0].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$",fontsize=20)
+    ax[0].set_xlabel("$\log z$")
+    ax[0].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$")
     ax[0].legend(fontsize=14,loc="upper left")
 
     ax[1].plot(lgzbins_strong_tot,np.mean(dNdlogzdt_strong_tot,axis=0),color=color_palette["strong_trip"],linewidth=2,label="Strong triples")
@@ -823,8 +823,8 @@ def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns):
     ax[1].set_yscale("log")
     ax[1].set_yticks([1e-1,1e-3,1e-5,1e-7])
     ax[1].set_xticks(np.arange(-3,1.5,1))
-    ax[1].set_xlabel("$\log z$",fontsize=20)
-    ax[1].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$",fontsize=20)
+    ax[1].set_xlabel("$\log z$")
+    ax[1].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$")
     ax[1].legend(fontsize=14,loc="upper left")
 
     ax[2].plot(lgzbins_iso,dNdlogzdt_all,color=color_palette["all"],linewidth=2,label="Fiducial model")
@@ -833,13 +833,13 @@ def plot_merger_rates(Tr_objects,weak_tr,iso_bin,stalled_objs,Nruns):
     ax[2].set_ylim(1e-8,1)
     ax[2].set_yticks([1e-1,1e-3,1e-5,1e-7])
     ax[2].set_xticks(np.arange(-3,1.5,1))
-    ax[2].set_xlabel("$\log z$",fontsize=20)
-    ax[2].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$",fontsize=20)
-    ax[2].legend(fontsize=14,loc="upper left")
+    ax[2].set_xlabel("$\log z$")
+    ax[2].set_ylabel(r"$\log (d^2 N / (d \log z dt)  \times 1\text{yr})$")
+    ax[2].legend(loc="upper left")
 
-    np.savetxt(savepath+"triple_system_merger_rates.txt",(lgzbins_strong_tot,np.mean(dNdlogzdt_strong_tot,axis=0)))
-    np.savetxt(savepath+"all_system_merger_rates.txt",(lgzbins_iso,dNdlogzdt_all))
-    print(f"The merger rate files are saved at {savepath}")   
+    np.savetxt(merger_rates_path+"triple_system_merger_rates.txt",(lgzbins_strong_tot,np.mean(dNdlogzdt_strong_tot,axis=0)))
+    np.savetxt(merger_rates_path+"all_system_merger_rates.txt",(lgzbins_iso,dNdlogzdt_all))
+    print(f"The merger rate files are saved at {merger_rates_path}")   
 
     plt.tight_layout()
 
