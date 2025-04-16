@@ -155,8 +155,8 @@ def print_stalled_merger_rates(iso_bin,weak_tr,strong_tr,stalled_objs,Nruns,tota
 
     prompt_merger = prompt_merger/Nruns
     merger_after_ejections = merger_after_ejections/Nruns
-    Total_mergers_in_stalled = prompt_merger+merger_after_ejections
-    #Total_mergers_in_stalled = prompt_merger
+    # Total_mergers_in_stalled = prompt_merger+merger_after_ejections
+    Total_mergers_in_stalled = prompt_merger
 
     iso_bin_mergers = np.sum(iso_bin.merger_flag)
     weak_tr_bin_mergers = np.sum(weak_tr.merger_mask)
@@ -166,7 +166,9 @@ def print_stalled_merger_rates(iso_bin,weak_tr,strong_tr,stalled_objs,Nruns,tota
     print(f"There are a total of {Total_mergers_in_stalled:.0f} ({Total_mergers_in_stalled/Nmbhb * 100:.2f} %)triple-induced mergers")
 
 
-    merger_rates = [obj.total_merger_rate("all", zbinsize, zmax) for obj in tqdm(stalled_objs, desc="Calculating Merger Rates")]
+    # merger_rates = [obj.total_merger_rate("all", zbinsize, zmax) for obj in tqdm(stalled_objs, desc="Calculating Merger Rates")]
+    merger_rates = [obj.total_merger_rate("Tr", zbinsize, zmax) for obj in tqdm(stalled_objs, desc="Calculating Merger Rates")]
+
     stalled_triple_merger_rate,stalled_cum_merger_rate = np.mean(merger_rates,axis=0)
     print(f"The total merger rate in the stalled model is {stalled_triple_merger_rate:.3f} yr^{-1}")
     print(f"The total merger rate in the fiducial (isolated binary+triple) model is {total_merger_rate:.2f} yr^{-1}")
