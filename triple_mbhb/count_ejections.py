@@ -403,3 +403,437 @@ def calculate_relative_ejections(strong_tr,weak_triso_bin, Nruns, N_kick_realiza
         relative_fractions[i] = slingshot_fractions['slingshot'][i] / gwrecoil_fractions[gwrecoil_kick_type][i]
 
     return relative_fractions, slingshot_bin_centers['slingshot']
+
+
+def calculate_total_number_of_ejections(N_kicks,Nruns,strong_tr, weak_tr, iso_bin):
+    total_random_ejections = []
+    total_hybrid_ejections = []
+    total_aligned_ejections = []
+
+    total_random_ejections_Tr = []
+    total_hybrid_ejections_Tr = []
+    total_aligned_ejections_Tr = []
+    
+    for i in range(N_kicks):
+        total_random_ejections_i = []
+        total_hybrid_ejections_i = []
+        total_aligned_ejections_i = []
+
+        total_random_ejections_Tr_i = []
+        total_hybrid_ejections_Tr_i = []
+        total_aligned_ejections_Tr_i = []
+    
+        for j in range(Nruns):
+            total_random_ejections_i.append(
+            np.sum(iso_bin.ejection_random_mask[i]) +
+            np.sum(weak_tr.ejection_random_mask[i]) +
+            np.sum(strong_tr[j].ejection_random_mask[i])
+        )
+            total_random_ejections_Tr_i.append(np.sum(strong_tr[j].ejection_random_mask[i]))
+            total_hybrid_ejections_Tr_i.append(np.sum(strong_tr[j].ejection_hybrid_mask[i]))
+            total_aligned_ejections_Tr_i.append(np.sum(strong_tr[j].ejection_aligned_mask[i]))
+
+            total_hybrid_ejections_i.append(
+            np.sum(iso_bin.ejection_hybrid_mask[i]) +
+            np.sum(weak_tr.ejection_hybrid_mask[i]) +
+            np.sum(strong_tr[j].ejection_hybrid_mask[i])
+        )
+            total_aligned_ejections_i.append(
+            np.sum(iso_bin.ejection_aligned_mask[i]) +
+            np.sum(weak_tr.ejection_aligned_mask[i]) +
+            np.sum(strong_tr[j].ejection_aligned_mask[i])
+        )
+    
+        total_random_ejections.append(np.mean(total_random_ejections_i))
+        total_hybrid_ejections.append(np.mean(total_hybrid_ejections_i))
+        total_aligned_ejections.append(np.mean(total_aligned_ejections_i))
+
+        total_aligned_ejections_Tr.append(np.mean(total_aligned_ejections_Tr_i))
+        total_hybrid_ejections_Tr.append(np.mean(total_hybrid_ejections_Tr_i))
+        total_random_ejections_Tr.append(np.mean(total_random_ejections_Tr_i))
+    
+    average_ejection_slingshot = np.mean([np.sum(strong_tr[i].ejection_slingshot_mask) for i in range(Nruns)])
+    print("The average number of slingshot ejections is: %3.1f"%(average_ejection_slingshot))
+    print("The average number of random ejections is: %3.1f" % (np.mean(total_random_ejections)))
+    print("The average number of hybrid ejections is: %3.1f "%(np.mean(total_hybrid_ejections)))
+    print("The average number of aligned ejections is: %3.1f"%(np.mean(total_aligned_ejections)))
+    print("--------------------")
+    print("The average number of random ejections in strong triples is: %3.1f" % (np.mean(total_random_ejections_Tr)))
+    print("The average number of hybrid ejections in strong triples is: %3.1f "%(np.mean(total_hybrid_ejections_Tr)))
+    print("The average number of aligned ejections in strong triples is: %3.1f"%(np.mean(total_aligned_ejections_Tr)))
+
+
+def assign_bhids(iso_bin, weak_tr, strong_tr, Nruns):
+    iso_bin.bhid1 = iso_bin.binary_ids[:,0]
+    iso_bin.bhid2 = iso_bin.binary_ids[:,1]
+
+    weak_tr.bhid1 = weak_tr.bhid_inner[:,0]
+    weak_tr.bhid2 = weak_tr.bhid_inner[:,1]
+    weak_tr.bhid3 = weak_tr.bhid_outer[:,0]
+    weak_tr.bhid4 = weak_tr.bhid_outer[:,1]
+
+    for i in range(Nruns):
+        strong_tr[i].bhid1 = strong_tr[i].bhid_inner[:,0]
+        strong_tr[i].bhid2 = strong_tr[i].bhid_inner[:,1]
+        strong_tr[i].bhid3 = strong_tr[i].bhid_outer[:,0]
+        strong_tr[i].bhid4 = strong_tr[i].bhid_outer[:,1]
+
+    iso_invalid_merger_mask = np.zeros_like(iso_bin.bhid1, dtype=bool)
+    weak_triple_invalid_merger_mask = np.zeros_like(weak_tr.bhid1, dtype=bool)
+    strong_triple_invalid_merger_mask = np.zeros_like(strong_tr[0].bhid1, dtype=bool)
+
+    return None
+
+def find_invalid_mergers(Nruns,strong_tr,weak_tr,iso_bin,ejection_mask_key,spin_i=0,include_slingshot=False):
+
+    #assign_bhids(iso_bin, weak_tr, strong_tr,Nruns)
+
+    bhid_cols_in_iso_bins = {"bhid1","bhid2"}
+    bhid_cols_in_trips = {"bhid1","bhid2","bhid3","bhid4"}
+
+    # Create masks for invalid mergers
+    # These masks will be updated based on the ejection conditions
+    iso_invalid_merger_mask = np.zeros_like(iso_bin.bhid1, dtype=bool)
+    weak_triple_invalid_merger_mask = np.zeros_like(weak_tr.bhid1, dtype=bool)
+    strong_triple_invalid_merger_mask = np.zeros_like(strong_tr.bhid1, dtype=bool)
+    
+    # Get the ejection masks for the current spin index
+    iso_bin_eject_mask = getattr(iso_bin,ejection_mask_key)[spin_i]
+    weak_tr_eject_mask = getattr(weak_tr,ejection_mask_key)[spin_i]
+    strong_tr_eject_mask = getattr(strong_tr,ejection_mask_key)[spin_i]
+
+    #iso binaries affected by "ejection_mask_key"
+
+    for i, bhid_x in enumerate(bhid_cols_in_iso_bins):
+        for j, bhid_y in enumerate(bhid_cols_in_iso_bins):
+                common_occurrences_of_y_ejected_in_x = np.in1d(getattr(iso_bin,bhid_x),getattr(iso_bin,bhid_y)[iso_bin.merger_mask][iso_bin_eject_mask])
+                bhidx_indices = np.where(common_occurrences_of_y_ejected_in_x)[0]
+                if len(bhidx_indices) > 0:
+                        bhidy_indices = np.array([np.where(getattr(iso_bin,bhid_y) == getattr(iso_bin,bhid_x)[i])[0][0] for i in bhidx_indices])
+                        different_indices_mask = bhidx_indices != bhidy_indices
+                        bhidx_t_merger = iso_bin.t_merge[bhidx_indices]
+                        bhidy_t_merger = iso_bin.t_merge[bhidy_indices]
+                        iso_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhidy_t_merger[different_indices_mask] < bhidx_t_merger[different_indices_mask]
+                else:
+                        continue
+                
+        for k,bhid_z in enumerate(bhid_cols_in_trips):
+            common_occurrences_of_z_ejected_in_x = np.in1d(getattr(iso_bin,bhid_x),getattr(weak_tr,bhid_z)[weak_tr.merger_mask][weak_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_z_ejected_in_x)[0]
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(weak_tr,bhid_z) == getattr(iso_bin,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhid1_t_merger = iso_bin.t_merge[bhidx_indices]
+                bhid_wt_t_form = weak_tr.t_triple_form[bhidz_indices]
+                iso_invalid_merger_mask[bhidx_indices[different_indices_mask]] |=  bhid_wt_t_form[different_indices_mask] < bhid1_t_merger[different_indices_mask]
+                #weak_triple_invalid_merger_mask[bhidz_indices[different_indices_mask]] |= bhid1_t_merger[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+            else:
+                continue
+
+            common_occurrences_of_strong_ejected_in_x = np.in1d(getattr(iso_bin,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.merger_mask][strong_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_strong_ejected_in_x)[0]
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(iso_bin,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhid1_t_merger = iso_bin.t_merge[bhidx_indices]
+                bhid_st_t_form = strong_tr.t_triple_form[bhidz_indices]
+                iso_invalid_merger_mask[bhidx_indices[different_indices_mask]] |=  bhid_st_t_form[different_indices_mask] < bhid1_t_merger[different_indices_mask]
+                #strong_triple_invalid_merger_mask[bhidz_indices[different_indices_mask]] |= bhid1_t_merger[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+            else:
+                continue
+
+            if include_slingshot:
+                common_occurrences_of_sling_ejected_in_x = np.in1d(getattr(iso_bin,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.ejection_slingshot_mask])
+                bhidx_indices = np.where(common_occurrences_of_sling_ejected_in_x)[0]
+                if len(bhidx_indices) > 0:
+                    bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(iso_bin,bhid_x)[i])[0][0] for i in bhidx_indices])
+                    different_indices_mask = bhidx_indices != bhidz_indices
+                    bhid1_t_merger = iso_bin.t_merge[bhidx_indices]
+                    bhid_st_t_form = strong_tr.t_triple_form[bhidz_indices]
+                    iso_invalid_merger_mask[bhidx_indices[different_indices_mask]] |=  bhid_st_t_form[different_indices_mask] < bhid1_t_merger[different_indices_mask]
+    
+    #weak triples affected by "ejection_mask_key"
+
+    for i,bhid_x in enumerate(bhid_cols_in_trips):
+        for j, bhid_y in enumerate(bhid_cols_in_iso_bins):
+            common_occurrences_of_y_ejected_in_x = np.in1d(getattr(weak_tr,bhid_x),getattr(iso_bin,bhid_y)[iso_bin.merger_mask][iso_bin_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_y_ejected_in_x)[0]
+            
+            if len(bhidx_indices) > 0:
+                bhidy_indices = np.array([np.where(getattr(iso_bin,bhid_y) == getattr(weak_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidy_indices
+                bhidy_t_merger = iso_bin.t_merge[bhidy_indices]
+                bhid_wt_t_form = weak_tr.t_triple_form[bhidx_indices]
+                weak_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhidy_t_merger[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+
+            else:
+                continue
+
+        for k, bhid_z in enumerate(bhid_cols_in_iso_bins):
+            common_occurrences_of_y_ejected_in_x = np.in1d(getattr(weak_tr,bhid_x),getattr(weak_tr,bhid_z)[weak_tr.merger_mask][weak_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_y_ejected_in_x)[0]
+            
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(weak_tr,bhid_z) == getattr(weak_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhidz_t_form = weak_tr.t_triple_form[bhidz_indices]
+                bhid_wt_t_form = weak_tr.t_triple_form[bhidx_indices]
+                weak_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhidz_t_form[different_indices_mask] < bhid_wt_t_form[different_indices_mask]  
+                
+            else:
+                continue
+                
+            common_occurrences_of_strong_ejected_in_x = np.in1d(getattr(weak_tr,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.merger_mask][strong_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_strong_ejected_in_x)[0]
+                
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(weak_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhid1_t_form = weak_tr.t_triple_form[bhidx_indices]
+                bhid_wt_t_form =strong_tr.t_triple_form[bhidz_indices]
+                weak_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhid1_t_form[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+            
+            else:
+                continue
+            
+            if include_slingshot:
+                common_occurrences_of_sling_ejected_in_x = np.in1d(getattr(weak_tr,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.ejection_slingshot_mask])
+                bhidx_indices = np.where(common_occurrences_of_sling_ejected_in_x)[0]
+                
+                if len(bhidx_indices) > 0:
+                    bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(weak_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                    different_indices_mask = bhidx_indices != bhidz_indices
+                    bhid1_wt_t_form = weak_tr.t_triple_form[bhidx_indices]
+                    bhid_st_t_form = strong_tr.t_triple_form[bhidz_indices]
+                    weak_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |=  bhid_st_t_form[different_indices_mask] < bhid1_wt_t_form[different_indices_mask]
+                
+    #strong triples affected by "gw-key"
+                
+    for i,bhid_x in enumerate(bhid_cols_in_trips):
+        for j, bhid_y in enumerate(bhid_cols_in_iso_bins):
+            
+            common_occurrences_of_y_ejected_in_x = np.in1d(getattr(strong_tr,bhid_x),getattr(iso_bin,bhid_y)[iso_bin.merger_mask][iso_bin_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_y_ejected_in_x)[0]
+
+            if len(bhidx_indices) > 0:
+                bhidy_indices = np.array([np.where(getattr(iso_bin,bhid_y) == getattr(strong_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidy_indices
+                bhidy_t_merger = iso_bin.t_merge[bhidy_indices]
+                bhid_wt_t_form = strong_tr.t_triple_form[bhidx_indices]
+                strong_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhidy_t_merger[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+
+            else:
+                continue
+
+        for k, bhid_z in enumerate(bhid_cols_in_iso_bins):
+            common_occurrences_of_y_ejected_in_x = np.in1d(getattr(strong_tr,bhid_x),getattr(weak_tr,bhid_z)[weak_tr.merger_mask][weak_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_y_ejected_in_x)[0]
+            
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(weak_tr,bhid_z) == getattr(strong_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhidz_t_form = weak_tr.t_triple_form[bhidz_indices]
+                bhid_wt_t_form = strong_tr.t_triple_form[bhidx_indices]
+                strong_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhidz_t_form[different_indices_mask] < bhid_wt_t_form[different_indices_mask]  
+                
+            else:
+                continue
+                
+            common_occurrences_of_strong_ejected_in_x = np.in1d(getattr(strong_tr,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.merger_mask][strong_tr_eject_mask])
+            bhidx_indices = np.where(common_occurrences_of_strong_ejected_in_x)[0]
+                
+            if len(bhidx_indices) > 0:
+                bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(strong_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                different_indices_mask = bhidx_indices != bhidz_indices
+                bhid_wt_t_form = strong_tr.t_triple_form[bhidz_indices]
+                bhid1_t_form = strong_tr.t_triple_form[bhidx_indices]
+                strong_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |= bhid1_t_form[different_indices_mask] < bhid_wt_t_form[different_indices_mask]
+            
+            else:
+                continue
+            
+            if include_slingshot:
+                common_occurrences_of_sling_ejected_in_x = np.in1d(getattr(strong_tr,bhid_x),getattr(strong_tr,bhid_z)[strong_tr.ejection_slingshot_mask])
+                bhidx_indices = np.where(common_occurrences_of_sling_ejected_in_x)[0]
+                
+                if len(bhidx_indices) > 0:
+                    bhidz_indices = np.array([np.where(getattr(strong_tr,bhid_z) == getattr(strong_tr,bhid_x)[i])[0][0] for i in bhidx_indices])
+                    different_indices_mask = bhidx_indices != bhidz_indices
+                    bhid1_wt_t_form = strong_tr.t_triple_form[bhidx_indices]
+                    bhid_st_t_form = strong_tr.t_triple_form[bhidz_indices]
+                    strong_triple_invalid_merger_mask[bhidx_indices[different_indices_mask]] |=  bhid_st_t_form[different_indices_mask] < bhid1_wt_t_form[different_indices_mask]
+
+                else:
+                    continue
+
+    return iso_invalid_merger_mask,weak_triple_invalid_merger_mask,strong_triple_invalid_merger_mask
+
+def assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,spin_key,slingshot=False):
+
+    ejection_kick_mask = 'ejection_'+spin_key+'_mask'
+    iso_inv_masks = []
+    weak_inv_masks = []
+    strong_inv_masks = []
+    for i in tqdm(range(N_kick_realization), desc="Processing kick realizations"):
+        realization_iso_masks = []   # Store iso masks for each realization
+        realization_weak_masks = []  # Store weak masks for each realization
+        realization_strong_masks = [] # Store strong masks for each realization
+        
+        for j in tqdm(range(Nruns), desc=f"Processing runs for realization {i+1}/{N_kick_realization}", leave=False):
+            # Find invalid mergers for the given realization and run
+            iso_inv, weak_inv, strong_inv = find_invalid_mergers(Nruns,
+                strong_tr[j], weak_tr, iso_bin, ejection_kick_mask, spin_i=i,include_slingshot=slingshot)
+            # Append masks for this run
+            realization_iso_masks.append(iso_inv)
+            realization_weak_masks.append(weak_inv)
+            realization_strong_masks.append(strong_inv)
+        
+        # Append realization masks to the main lists
+        iso_inv_masks.append(realization_iso_masks)
+        weak_inv_masks.append(realization_weak_masks)
+        strong_inv_masks.append(realization_strong_masks)
+
+    # Convert the nested lists into 3D arrays if necessary
+    iso_inv_masks = np.array(iso_inv_masks)  # Requires numpy
+    weak_inv_masks = np.array(weak_inv_masks)
+    strong_inv_masks = np.array(strong_inv_masks)
+
+    if(slingshot):
+        setattr(iso_bin,spin_key+'_invalid_mask', iso_inv_masks)
+        setattr(weak_tr,spin_key+'_invalid_mask', weak_inv_masks)
+        setattr(strong_tr[0],spin_key+'_invalid_mask',strong_inv_masks)
+    else:
+        setattr(iso_bin,spin_key+'_invalid_mask_wo_sling', iso_inv_masks)
+        setattr(weak_tr,spin_key+'_invalid_mask_wo_sling', weak_inv_masks)
+        setattr(strong_tr[0],spin_key+'_invalid_mask_wo_sling',strong_inv_masks)
+
+    return None
+
+def assigning_invalid_merger_masks_to_objs(strong_tr, weak_tr, iso_bin, N_kick_realization, Nruns):
+
+    assign_bhids(iso_bin, weak_tr, strong_tr,Nruns)
+
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'random')
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'hybrid')
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'aligned')
+
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'random',slingshot=True)
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'hybrid',slingshot=True)
+    assign_invalid_merger_mask(Nruns,N_kick_realization,strong_tr,weak_tr,iso_bin,'aligned',slingshot=True)
+
+    return None
+
+def calculate_invalid_merger_fractions(strong_tr, weak_tr, iso_bin, n_kick_realization, nruns, include_slingshot=True):
+    """
+    Calculate the fraction of mergers that are invalid due to ejections for
+    different spin configurations.
+    
+    Parameters:
+    -----------
+    strong_tr : list
+        List of strong triple objects
+    weak_tr : object
+        Weak triple object
+    iso_bin : object
+        Isolated binary object
+    n_kick_realization : int
+        Number of kick realizations
+    nruns : int
+        Number of simulation runs
+    include_slingshot : bool, optional
+        Whether to include slingshot ejections in the calculation (default: True)
+        
+    Returns:
+    --------
+    dict
+        Dictionary with keys 'random', 'hybrid', 'aligned' containing the invalid merger
+        fractions for each realization and run
+    """
+    # Set up configuration for calculation
+    spin_types = ['random', 'hybrid', 'aligned']
+    fractions = {spin_type: [] for spin_type in spin_types}
+    
+    # Get merger counts once since they're constant
+    iso_mergers = np.sum(iso_bin.merger_mask)
+    weak_tr_mergers = np.sum(weak_tr.merger_mask)
+    
+    # Select appropriate mask attribute suffix based on slingshot inclusion
+    mask_suffix = "_invalid_mask" if include_slingshot else "_invalid_mask_wo_sling"
+    
+    # Calculate for each realization
+    for i in range(n_kick_realization):
+        realization_fractions = {spin_type: [] for spin_type in spin_types}
+        
+        for j in range(nruns):
+            # Get strong triple mergers for this run
+            strong_tr_mergers = np.sum(strong_tr[j].merger_mask)
+            total_mergers = iso_mergers + weak_tr_mergers + strong_tr_mergers
+            
+            # Calculate fractions for each spin type
+            for spin_type in spin_types:
+                mask_attr = f"{spin_type}{mask_suffix}"
+                
+                # Count invalid mergers across all system types
+                iso_invalid = np.sum(iso_bin.merger_mask & getattr(iso_bin, mask_attr)[i][j])
+                weak_invalid = np.sum(weak_tr.merger_mask & getattr(weak_tr, mask_attr)[i][j])
+                strong_invalid = np.sum(strong_tr[j].merger_mask & getattr(strong_tr[0], mask_attr)[i][j])
+                
+                # Calculate fraction and store
+                invalid_fraction = (iso_invalid + weak_invalid + strong_invalid) / total_mergers
+                realization_fractions[spin_type].append(invalid_fraction)
+        
+        # Store results for this realization
+        for spin_type in spin_types:
+            fractions[spin_type].append(realization_fractions[spin_type])
+    
+    return fractions
+
+    
+def summarize_invalid_merger_fractions(strong_tr, weak_tr, iso_bin, N_kick_realization, Nruns):
+        """
+        Summarize and calculate invalid merger fractions with and without slingshot ejections.
+
+        Parameters:
+        - strong_tr: List of strong triple objects.
+        - weak_tr: Weak triple object.
+        - iso_bin: Isolated binary object.
+        - N_kick_realization: Number of kick realizations.
+        - Nruns: Number of simulation runs.
+
+        Returns:
+        - dict: Summary statistics for invalid merger fractions with and without slingshot ejections.
+        """
+
+        assigning_invalid_merger_masks_to_objs(strong_tr, weak_tr, iso_bin, N_kick_realization, Nruns)
+
+        # Calculate invalid merger fractions with slingshot ejections
+        tot_invalid_merger_fraction = calculate_invalid_merger_fractions(
+            strong_tr, weak_tr, iso_bin, N_kick_realization, Nruns, include_slingshot=True
+        )
+
+        # Calculate invalid merger fractions without slingshot ejections
+        tot_invalid_merger_fraction_wo_sling = calculate_invalid_merger_fractions(
+            strong_tr, weak_tr, iso_bin, N_kick_realization, Nruns, include_slingshot=False
+        )
+
+        # Summarize results
+        summary = {"with_slingshot": {}, "without_slingshot": {}, "slingshot_contribution": {}}
+
+        # With slingshot ejections
+        for spin_type in ['random', 'hybrid', 'aligned']:
+            mean_fraction = np.mean(tot_invalid_merger_fraction[spin_type]) * 100
+            print(f"{mean_fraction:.1f}% of mergers won't happen due to GW {spin_type} + slingshot ejections")
+
+        # Without slingshot ejections
+        for spin_type in ['random', 'hybrid', 'aligned']:
+            mean_fraction = np.mean(tot_invalid_merger_fraction_wo_sling[spin_type]) * 100
+            print(f"{mean_fraction:.1f}% of mergers won't happen due to GW {spin_type} ejections")
+
+        # Calculate percentage of slingshot contribution in random+slingshot
+        random_with_slingshot = np.mean(tot_invalid_merger_fraction['random']) * 100
+        random_without_slingshot = np.mean(tot_invalid_merger_fraction_wo_sling['random']) * 100
+        slingshot_percentage = (random_with_slingshot - random_without_slingshot) / random_with_slingshot * 100
+        print(f"  - Slingshot ejections account for {slingshot_percentage:.1f}% of all invalid mergers in random+slingshot")
+
+
+        return None
