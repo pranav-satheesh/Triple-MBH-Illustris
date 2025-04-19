@@ -406,6 +406,10 @@ def calculate_relative_ejections(strong_tr,weak_triso_bin, Nruns, N_kick_realiza
 
 
 def calculate_total_number_of_ejections(N_kicks,Nruns,strong_tr, weak_tr, iso_bin):
+
+    N_total_systems = iso_bin.N_iso_binaries+weak_tr.N_weak_triples+strong_tr[0].N_strong_triples
+    N_strong_triples = strong_tr[0].N_strong_triples
+
     total_random_ejections = []
     total_hybrid_ejections = []
     total_aligned_ejections = []
@@ -453,15 +457,15 @@ def calculate_total_number_of_ejections(N_kicks,Nruns,strong_tr, weak_tr, iso_bi
         total_random_ejections_Tr.append(np.mean(total_random_ejections_Tr_i))
     
     average_ejection_slingshot = np.mean([np.sum(strong_tr[i].ejection_slingshot_mask) for i in range(Nruns)])
-    print("The average number of slingshot ejections is: %3.1f"%(average_ejection_slingshot))
-    print("The average number of random ejections is: %3.1f" % (np.mean(total_random_ejections)))
-    print("The average number of hybrid ejections is: %3.1f "%(np.mean(total_hybrid_ejections)))
-    print("The average number of aligned ejections is: %3.1f"%(np.mean(total_aligned_ejections)))
+    print("The average number of slingshot ejections is: %3.1f which is %2.1f %% of all binaries"%(average_ejection_slingshot,average_ejection_slingshot/N_total_systems*100))
+    print("The average number of random ejections is: %3.1f which is %2.1f %% of all binaries" % (np.mean(total_random_ejections),np.mean(total_random_ejections)/N_total_systems*100))
+    print("The average number of hybrid ejections is: %3.1f which is %2.1f %% of all binaries "%(np.mean(total_hybrid_ejections),np.mean(total_hybrid_ejections)/N_total_systems*100))
+    print("The average number of aligned ejections is: %3.1f which is %2.1f %% of all binaries"%(np.mean(total_aligned_ejections),np.mean(total_aligned_ejections)/N_total_systems*100))
     print("--------------------")
-    print("The average number of random ejections in strong triples is: %3.1f" % (np.mean(total_random_ejections_Tr)))
-    print("The average number of hybrid ejections in strong triples is: %3.1f "%(np.mean(total_hybrid_ejections_Tr)))
-    print("The average number of aligned ejections in strong triples is: %3.1f"%(np.mean(total_aligned_ejections_Tr)))
-
+    print("The average number of random ejections in strong triples is: %3.1f which is %2.1f %% of all strong triples" % (np.mean(total_random_ejections_Tr),np.mean(total_random_ejections_Tr)/N_strong_triples*100))
+    print("The average number of hybrid ejections in strong triples is: %3.1f which is %2.1f%% of all strong triples"%(np.mean(total_hybrid_ejections_Tr),np.mean(total_hybrid_ejections_Tr)/N_strong_triples*100))
+    print("The average number of aligned ejections in strong triples is: %3.1f which is %2.1f%% of all strong triples"%(np.mean(total_aligned_ejections_Tr),np.mean(total_aligned_ejections_Tr)/N_strong_triples*100))
+    print("Slingshot ejections are %2.1f %% of strong triples"%(average_ejection_slingshot/N_strong_triples*100))
 
 def assign_bhids(iso_bin, weak_tr, strong_tr, Nruns):
     iso_bin.bhid1 = iso_bin.binary_ids[:,0]

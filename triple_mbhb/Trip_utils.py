@@ -41,7 +41,15 @@ def import_objects(Nruns,obj_dir="/orange/lblecha/pranavsatheesh/trip_mbh_objs/"
 
     print("------------------")
     #print the stats for strong triples
-    Trip_stats(strong_tr)
+    total_st_mergers = Trip_stats(strong_tr)
+
+    print("-------------")
+    total_binary_mergers = np.sum(iso_bin.merger_mask) + np.sum(weak_tr.merger_mask) + np.sum(strong_tr[0].bin_merge_flag) #total number of mergers under binary inspiral evolution
+    print(f"Total number of binary mergers is {total_binary_mergers} and it is {total_binary_mergers/total_systems*100:.2f} %")
+    total_mergers_with_st = total_binary_mergers + total_st_mergers #total number of mergers with strong triples
+    print(f"Total number of mergers with strong triples is {total_mergers_with_st} and it is {total_mergers_with_st/total_systems*100:.2f} %")
+    print(f"With strong triples added mergers increase by {(total_mergers_with_st-total_binary_mergers)/total_systems*100:.2f} %")
+
 
     return strong_tr, weak_tr, iso_bin, stalled_objs
 
@@ -69,7 +77,8 @@ def Trip_stats(Trip_objs):
     no_mergers_avg = tota_strong_Trip - total_mergers_avg
 
     merger_wt_triple_but_not_inspiral = merger_wt_triple_but_not_inspiral/Nruns
-
+    
+    print("In strong triples:")
     print(f"Average prompt merger is {Prompt_mergers_avg} which is {(Prompt_mergers_avg/tota_strong_Trip) * 100:.2f} %")
     print(f"Average merger after ejection is {mergers_after_ejection_avg} which is {(mergers_after_ejection_avg/tota_strong_Trip) * 100:.2f} %")
     print(f"There are {no_mergers_avg:.2f} no mergers on average which is {(no_mergers_avg/tota_strong_Trip) * 100:.2f}%")   
