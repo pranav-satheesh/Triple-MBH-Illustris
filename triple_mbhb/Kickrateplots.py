@@ -275,7 +275,7 @@ def plot_spin_dist():
     color_palette={"random":"#377eb8","cold":"#a2c8ec","aligned":"#e41a1c"}
 
     fig,ax = plt.subplots(2,1,figsize=(8,10))
-    ax[1].plot(a_rd_bins,a_rd_counts,color=color_palette["random"],label="random-dry")
+    ax[1].plot(a_rd_bins,a_rd_counts,color=color_palette["random"],label="random")
     ax[1].plot(a_cold_bins,a_cold_counts,color=color_palette["cold"],linestyle="--",label="cold")
     ax[1].axvline(x=0.9,color=color_palette["aligned"],label="aligned")
     ax[1].set_xlim(0,1)
@@ -287,7 +287,7 @@ def plot_spin_dist():
     xticks = ax[1].xaxis.get_major_ticks()
     xticks[0].label1.set_visible(False)
 
-    ax[0].plot(theta_rd_bins,theta_rd_counts,color="#0571b0",label="random-dry")
+    ax[0].plot(theta_rd_bins,theta_rd_counts,color="#0571b0",label="random")
     ax[0].plot(cold_bins,cold_counts,color="#92c5de",linestyle="--",label="cold")
     ax[0].plot(theta5deg_bins,theta5deg_counts,color="#ca0020",label="aligned")
     ax[0].set_xlim(0.5,90)
